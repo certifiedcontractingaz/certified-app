@@ -516,8 +516,8 @@ html,body { width:100%; height:100%; background:var(--navy); font-family:"Barlow
   <div class="intake-wrap">
     <div class="co-logo">CERTIFIED CONTRACTING LLC</div>
     <div class="co-tag">ROC #364621 · KB-2 · Arizona's Finest</div>
-    <div class="intake-hed">CLOSING<br>SYSTEM</div>
-    <div class="intake-sub">Select rep — enter homeowner info</div>
+    <div class="intake-hed">ARIZONA'S<br>FINEST</div>
+    <div class="intake-sub">Who's on this appointment?</div>
     <div class="rep-row" id="rep-row">
       <div class="rep-card sel" id="rc0" onclick="pickRep(0)"><div class="rep-init">XM</div><div class="rep-nm">Xavier Medina</div><div class="rep-rl">Founder</div></div>
       <div class="rep-card" id="rc1" onclick="pickRep(1)"><div class="rep-init">CR</div><div class="rep-nm">Corbin Roberts</div><div class="rep-rl">Project Mgr</div></div>
@@ -530,7 +530,7 @@ html,body { width:100%; height:100%; background:var(--navy); font-family:"Barlow
         <input class="fi" id="hw-addr" type="text" placeholder="123 Main St, Scottsdale AZ" autocomplete="off" oninput="addrInput(this.value)">
         <div class="ac-list" id="ac-list"></div>
       </div>
-      <button class="cta" id="begin-btn">BEGIN PRESENTATION →</button>
+      <button class="cta" id="begin-btn">START INSPECTION →</button>
       <button class="cta-outline" onclick="showDashboard()">📊 REP DASHBOARD</button>
     </div>
   </div>
@@ -542,8 +542,49 @@ html,body { width:100%; height:100%; background:var(--navy); font-family:"Barlow
 <div class="screen" id="screen-trust">
   <div class="inner">
     <div class="eyebrow">Chapter 01</div><div class="gold-line"></div>
-    <div class="big-title">BEFORE WE<br>LOOK AT THE<br><span>ROOF</span></div>
-    <p style="font-size:14px;color:var(--gray2);line-height:1.65;margin-bottom:20px;font-style:italic;">"Before I make any recommendations, I want to understand your goals for this home."</p>
+    <div class="big-title">WE'VE BEEN<br>WORKING YOUR<br><span>NEIGHBORHOOD</span></div>
+
+    <!-- SOCIAL PROOF MAP -->
+    <div style="background:rgba(255,255,255,.03);border:1px solid rgba(201,168,76,.18);border-radius:10px;overflow:hidden;margin-bottom:16px;">
+      <div style="padding:12px 16px 8px;display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);margin-bottom:2px;">Certified Contracting — Nearby Completed Jobs</div>
+          <div style="font-size:11px;color:var(--gray);">Tap any pin to see the job</div>
+        </div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);" id="map-job-count">—</div>
+      </div>
+      <!-- Google Map embed -->
+      <div style="position:relative;width:100%;height:300px;background:#0d1f35;">
+        <div id="social-map" style="width:100%;height:100%;"></div>
+        <div id="map-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;background:rgba(11,31,58,.9);">
+          <div style="font-size:24px;">📍</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);">Loading nearby jobs...</div>
+        </div>
+      </div>
+      <!-- Job counter strip -->
+      <div style="padding:10px 16px;display:flex;gap:16px;border-top:1px solid rgba(201,168,76,.1);">
+        <div style="text-align:center;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);" id="map-count-mile">—</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);">Within 1 Mile</div>
+        </div>
+        <div style="width:1px;background:rgba(201,168,76,.12);"></div>
+        <div style="text-align:center;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);" id="map-count-3mile">—</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);">Within 3 Miles</div>
+        </div>
+        <div style="width:1px;background:rgba(201,168,76,.12);"></div>
+        <div style="flex:1;">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;color:var(--off);line-height:1.5;" id="map-neighborhood-txt">Locating neighborhood...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rep script for social proof moment -->
+    <div class="script-box" style="margin-bottom:18px;">
+      <div class="script-txt">"Before I head up — I want to show you something. We've already completed jobs on streets near you. Every one of these pins is a homeowner in your neighborhood we've already worked with. Same homes, same roof systems, same age. That's why we're in this area."</div>
+      <div class="script-tag">— Show the map. Let them look. Let the pins do the talking.</div>
+    </div>
+
     <div class="cred-item" style="margin-bottom:16px;">
       <div>
         <div class="cred-title">Rep on this appointment</div>
@@ -551,40 +592,40 @@ html,body { width:100%; height:100%; background:var(--navy); font-family:"Barlow
       </div>
     </div>
     <div style="margin-bottom:16px;">
-      <div class="section-label" style="margin-bottom:10px;">Discovery Questions</div>
+      <div class="section-label" style="margin-bottom:10px;">A Few Questions First</div>
       <div class="question-item" id="qi0" onclick="expandQ(0)">
-        <div class="qi-q">📅 How long do you plan to stay in this home?</div>
-        <div class="qi-hint">Tap to capture answer</div>
-        <input class="qi-input" id="qa0" type="text" placeholder="e.g. 10+ years, forever, unsure..." autocomplete="off" oninput="storeAnswer(0,this.value)" onfocus="expandQ(0)">
+        <div class="qi-q">📅 How long have you been in the home — and do you plan to stay long term?</div>
+        <div class="qi-hint">Tap to add notes</div>
+        <input class="qi-input" id="qa0" type="text" placeholder="Your answer..." autocomplete="off" oninput="storeAnswer(0,this.value)" onfocus="expandQ(0)">
       </div>
       <div class="question-item" id="qi1" onclick="expandQ(1)">
-        <div class="qi-q">⚠️ What concerns you most about the roof?</div>
-        <div class="qi-hint">Tap to capture answer</div>
-        <input class="qi-input" id="qa1" type="text" placeholder="e.g. leaks, age, storm damage..." autocomplete="off" oninput="storeAnswer(1,this.value)" onfocus="expandQ(1)">
+        <div class="qi-q">⚠️ Has anything about the roof crossed your mind lately — even a small thing?</div>
+        <div class="qi-hint">Tap to add notes</div>
+        <input class="qi-input" id="qa1" type="text" placeholder="Your answer..." autocomplete="off" oninput="storeAnswer(1,this.value)" onfocus="expandQ(1)">
       </div>
       <div class="question-item" id="qi2" onclick="expandQ(2)">
-        <div class="qi-q">💧 Have you had any leaks?</div>
-        <div class="qi-hint">Tap to capture answer</div>
-        <input class="qi-input" id="qa2" type="text" placeholder="e.g. yes — garage, no, not yet..." autocomplete="off" oninput="storeAnswer(2,this.value)" onfocus="expandQ(2)">
+        <div class="qi-q">💧 Have you ever had any water come in — ceiling stains, wet insulation, anything?</div>
+        <div class="qi-hint">Tap to add notes</div>
+        <input class="qi-input" id="qa2" type="text" placeholder="Your answer..." autocomplete="off" oninput="storeAnswer(2,this.value)" onfocus="expandQ(2)">
       </div>
       <div class="question-item" id="qi3" onclick="expandQ(3)">
-        <div class="qi-q">📋 Have you received other estimates?</div>
-        <div class="qi-hint">Tap to capture answer</div>
-        <input class="qi-input" id="qa3" type="text" placeholder="e.g. yes from 2 others, no, shopping around..." autocomplete="off" oninput="storeAnswer(3,this.value)" onfocus="expandQ(3)">
+        <div class="qi-q">📋 Are you talking to other companies — or is this your first look?</div>
+        <div class="qi-hint">Tap to add notes</div>
+        <input class="qi-input" id="qa3" type="text" placeholder="Your answer..." autocomplete="off" oninput="storeAnswer(3,this.value)" onfocus="expandQ(3)">
       </div>
       <div class="question-item" id="qi4" onclick="expandQ(4)">
-        <div class="qi-q">🔨 If we found major issues, fix correctly or patch?</div>
-        <div class="qi-hint">Tap to capture answer</div>
-        <input class="qi-input" id="qa4" type="text" placeholder="e.g. do it right the first time..." autocomplete="off" oninput="storeAnswer(4,this.value)" onfocus="expandQ(4)">
+        <div class="qi-q">🔨 If we find something real up there — are you the kind of person who handles things right away?</div>
+        <div class="qi-hint">Tap to add notes</div>
+        <input class="qi-input" id="qa4" type="text" placeholder="Your answer..." autocomplete="off" oninput="storeAnswer(4,this.value)" onfocus="expandQ(4)">
       </div>
     </div>
     <div class="commit-box">
-      <div class="commit-question">"Fair enough. If we find a solution that solves those concerns — would you at least consider moving forward today?"</div>
+      <div class="commit-question">"All I ask is this — if I go up there and find something real, and we can solve it for a number that makes sense for your situation, would you at least be open to hearing the full picture?"</div>
       <div class="commit-btns">
-        <button class="commit-yes" onclick="storeCommit(0,'yes')">✓ Absolutely</button>
+        <button class="commit-yes" onclick="storeCommit(0,'yes')">✓ That's Fair</button>
         <button class="commit-no" onclick="storeCommit(0,'maybe')">Maybe</button>
       </div>
-      <div class="commit-stored" id="c-stored-0"><span class="commit-stored-icon">✓</span><span class="commit-stored-txt">Commitment stored</span></div>
+      <div class="commit-stored" id="c-stored-0"><span class="commit-stored-icon">✓</span><span class="commit-stored-txt">✓ Got it</span></div>
     </div>
   </div>
 </div>
@@ -683,25 +724,25 @@ html,body { width:100%; height:100%; background:var(--navy); font-family:"Barlow
 <div class="screen" id="screen-why">
   <div class="inner">
     <div class="eyebrow">Chapter 02</div><div class="gold-line"></div>
-    <div class="big-title">WHY<br><span>CERTIFIED</span></div>
-    <p style="font-size:14px;color:var(--gray2);line-height:1.6;margin-bottom:18px;">We're not here to talk about roofing yet. We're here to talk about <strong style="color:var(--white);">certainty.</strong></p>
+    <div class="big-title">YOU'RE NOT<br>BUYING A ROOF.<br><span>YOU'RE BUYING CERTAINTY.</span></div>
+    <p style="font-size:14px;color:var(--gray2);line-height:1.6;margin-bottom:18px;">Anyone can put tiles on a house. What most companies can't give you is the <strong style="color:var(--white);">peace of mind that it was done right</strong> — and someone to call if it wasn't.</p>
     <div class="cred-row">
-      <div class="cred-item"><div class="cred-icon">🏛️</div><div><div class="cred-title">ROC Licensed & Bonded</div><div class="cred-sub">AZ KB-2 · ROC #364621 · Fully insured on every job</div></div><div class="cred-badge">✓</div></div>
-      <div class="cred-item"><div class="cred-icon">👷</div><div><div class="cred-title">100% In-House Crews</div><div class="cred-sub">No subcontractors — ever. The crew that quotes installs.</div></div><div class="cred-badge">✓</div></div>
-      <div class="cred-item"><div class="cred-icon">📱</div><div><div class="cred-title">CompanyCam Documentation</div><div class="cred-sub">Before, during, and after — every photo time-stamped</div></div><div class="cred-badge">✓</div></div>
-      <div class="cred-item"><div class="cred-icon">👤</div><div><div class="cred-title">Dedicated Project Manager</div><div class="cred-sub">One contact from start to punch list. No handoffs.</div></div><div class="cred-badge">✓</div></div>
-      <div class="cred-item"><div class="cred-icon">🏅</div><div><div class="cred-title">Manufacturer Certified</div><div class="cred-sub">TAMKO Pro Gold · Veer Ultimate Ultra partnership</div></div><div class="cred-badge">✓</div></div>
-      <div class="cred-item"><div class="cred-icon">📋</div><div><div class="cred-title">Warranty Registration</div><div class="cred-sub">Lifetime manufacturer + 5-year workmanship guarantee</div></div><div class="cred-badge">✓</div></div>
+      <div class="cred-item"><div class="cred-icon">🏛️</div><div><div class="cred-title">ROC Licensed, Bonded & Insured</div><div class="cred-sub">KB-2 · ROC #364621 · If something goes wrong, you're protected. Most budget contractors? You'd never collect.</div></div><div class="cred-badge">✓</div></div>
+      <div class="cred-item"><div class="cred-icon">👷</div><div><div class="cred-title">100% In-House Crews — Never Subcontracted</div><div class="cred-sub">The crew you meet is the crew that installs. We don't hand your home to a stranger the morning of the job.</div></div><div class="cred-badge">✓</div></div>
+      <div class="cred-item"><div class="cred-icon">📱</div><div><div class="cred-title">CompanyCam — Every Phase Documented</div><div class="cred-sub">Before, during, after — time-stamped photos. You'll see exactly what we found and exactly what we fixed.</div></div><div class="cred-badge">✓</div></div>
+      <div class="cred-item"><div class="cred-icon">👤</div><div><div class="cred-title">One Project Manager. One Number. No Runaround.</div><div class="cred-sub">Direct line to a real person who knows your job. Not a call center. Not a voicemail box.</div></div><div class="cred-badge">✓</div></div>
+      <div class="cred-item"><div class="cred-icon">🏅</div><div><div class="cred-title">TAMKO Pro Gold · Veer Certified Installer</div><div class="cred-sub">Most contractors can't offer manufacturer lifetime warranties. We're certified to install the system that earns them.</div></div><div class="cred-badge">✓</div></div>
+      <div class="cred-item"><div class="cred-icon">📋</div><div><div class="cred-title">Warranty Registered In Your Name</div><div class="cred-sub">Lifetime manufacturer + 5-year workmanship. Transferable if you sell. A legal document — not a handshake.</div></div><div class="cred-badge">✓</div></div>
     </div>
     <div class="rv"><div class="rv-hd"><div class="rv-stars">★★★★★</div><div class="rv-src">Google</div></div><div class="rv-txt">"It was a pleasure having Certified Contracting work on my 50-year old home. They hustled to get a bid in, communicated clearly, showed up on time, the quality of the work was exceptional, they cleaned up spotless."</div><div class="rv-auth">— Jay Thorne · Verified Google Review</div></div>
     <div class="rv"><div class="rv-hd"><div class="rv-stars">★★★★★</div><div class="rv-src">BBB</div></div><div class="rv-txt">"Great experience with Certified Contracting. Steve and Xavier were professional, informative, and made sure all my questions were answered. The crew kept the job site clean and were very pleasant."</div><div class="rv-auth">— John Hart · ZIP 85286 · Verified BBB Review</div></div>
     <div class="commit-box">
-      <div class="commit-question">"Would you agree that communication and accountability are important when you're investing this kind of money in your home?"</div>
+      <div class="commit-question">"When you're spending this kind of money on your home — would you agree that who does the work matters just as much as the price?"</div>
       <div class="commit-btns">
-        <button class="commit-yes" onclick="storeCommit(1,'yes')">✓ Absolutely</button>
-        <button class="commit-no" onclick="storeCommit(1,'no')">Not sure</button>
+        <button class="commit-yes" onclick="storeCommit(1,'yes')">✓ 100% Agree</button>
+        <button class="commit-no" onclick="storeCommit(1,'no')">Price is all that matters</button>
       </div>
-      <div class="commit-stored" id="c-stored-1"><span class="commit-stored-icon">✓</span><span class="commit-stored-txt">Commitment stored</span></div>
+      <div class="commit-stored" id="c-stored-1"><span class="commit-stored-icon">✓</span><span class="commit-stored-txt">✓ Noted</span></div>
     </div>
   </div>
 </div>
@@ -712,7 +753,8 @@ html,body { width:100%; height:100%; background:var(--navy); font-family:"Barlow
 <div class="screen" id="screen-findings">
   <div class="inner">
     <div class="eyebrow">Chapter 03</div><div class="gold-line"></div>
-    <div class="big-title">INSPECTION<br><span>FINDINGS</span></div>
+    <div class="big-title">HERE'S WHAT<br>I FOUND ON<br><span>YOUR ROOF</span></div>
+    <p style="font-size:14px;color:var(--gray2);line-height:1.65;margin-bottom:16px;font-style:italic;">"I want to show you exactly what's up there — not to alarm you, but because you deserve to know what you're working with before the next storm hits."</p>
     <a href="https://app.roofr.com/dashboard/team/491508/jobs" target="_blank" class="roofr-btn">
       <span class="rb-icon">📏</span>
       <div><div class="rb-title">Open Roofr</div><div class="rb-sub">Aerial satellite measurements →</div></div>
@@ -746,14 +788,14 @@ html,body { width:100%; height:100%; background:var(--navy); font-family:"Barlow
       <textarea class="obs-input" id="obs-notes" placeholder="Note what you found — areas of concern, tile cracks, flashing issues, exposed deck..." oninput="ST.observations=this.value"></textarea>
     </div>
     <div class="commit-box">
-      <div class="commit-question">"What stands out most to you about what we found today?"</div>
-      <textarea class="obs-input" id="hw-standout" placeholder="Capture homeowner response..." style="margin-bottom:12px;" oninput="ST.hwStandout=this.value"></textarea>
-      <div class="commit-question" style="margin-top:8px;">"Would you agree these areas are unlikely to improve on their own?"</div>
+      <div class="commit-question">"I want to show you what I found up there. What's your first reaction when you see this?"</div>
+      <textarea class="obs-input" id="hw-standout" placeholder="Capture homeowner response — their words matter, use them later..." style="margin-bottom:12px;" oninput="ST.hwStandout=this.value"></textarea>
+      <div class="commit-question" style="margin-top:8px;">"In your gut — does this feel like something that gets better on its own, or something that's going to cost more the longer it sits?"</div>
       <div class="commit-btns">
-        <button class="commit-yes" onclick="storeCommit(2,'yes')">✓ Agreed</button>
-        <button class="commit-no" onclick="storeCommit(2,'maybe')">Not sure</button>
+        <button class="commit-yes" onclick="storeCommit(2,'yes')">✓ Costs More to Wait</button>
+        <button class="commit-no" onclick="storeCommit(2,'maybe')">Not sure yet</button>
       </div>
-      <div class="commit-stored" id="c-stored-2"><span class="commit-stored-icon">✓</span><span class="commit-stored-txt">Commitment stored</span></div>
+      <div class="commit-stored" id="c-stored-2"><span class="commit-stored-icon">✓</span><span class="commit-stored-txt">✓ Noted</span></div>
     </div>
   </div>
 </div>
@@ -764,7 +806,8 @@ html,body { width:100%; height:100%; background:var(--navy); font-family:"Barlow
 <div class="screen" id="screen-waiting">
   <div class="inner">
     <div class="eyebrow">Chapter 04</div><div class="gold-line"></div>
-    <div class="big-title">COST OF<br><span>WAITING</span></div>
+    <div class="big-title">THE REAL<br>COST OF<br><span>"I'LL WAIT"</span></div>
+    <p style="font-size:14px;color:var(--gray2);line-height:1.65;margin-bottom:20px;font-style:italic;">"I hear 'I'll wait until next year' a lot. I want to show you what that decision actually costs — because the roof doesn't wait with you."</p>
     <div style="display:flex;flex-direction:column;gap:2px;margin-bottom:20px;">
       <div class="prog-step">
         <div><div class="prog-node ok">🏠</div><div class="rm-connector"></div></div>
@@ -800,12 +843,12 @@ html,body { width:100%; height:100%; background:var(--navy); font-family:"Barlow
       <div class="cc-row" style="padding-top:12px;border-top:1px solid rgba(201,168,76,.15);"><div class="cc-lbl" style="font-weight:700;color:var(--off);">Total Exposure — Wait</div><div class="cc-val red" id="wc-exp" style="font-size:28px;">$—</div></div>
     </div>
     <div class="commit-box">
-      <div class="commit-question">"Does it make more sense to replace the roof before it fails — or after it fails?"</div>
+      <div class="commit-question">"Looking at these numbers — does spending [today's quote] now make more sense than spending 3–4x that after a monsoon does the deciding for you?"</div>
       <div class="commit-btns">
-        <button class="commit-yes" onclick="storeCommit(3,'before')">✓ Before It Fails</button>
-        <button class="commit-no" onclick="storeCommit(3,'after')">Need to think</button>
+        <button class="commit-yes" onclick="storeCommit(3,'before')">✓ Do It Now</button>
+        <button class="commit-no" onclick="storeCommit(3,'after')">Still thinking</button>
       </div>
-      <div class="commit-stored" id="c-stored-3"><span class="commit-stored-icon">✓</span><span class="commit-stored-txt">Commitment stored</span></div>
+      <div class="commit-stored" id="c-stored-3"><span class="commit-stored-icon">✓</span><span class="commit-stored-txt">✓ Noted</span></div>
     </div>
   </div>
 </div>
@@ -844,12 +887,12 @@ html,body { width:100%; height:100%; background:var(--navy); font-family:"Barlow
       <div class="stat-card"><div class="stat-num">8–10</div><div class="stat-lbl">Storm Events</div><div class="stat-txt">Per monsoon season. Each one is a test your roof passes or fails.</div></div>
     </div>
     <div class="commit-box">
-      <div class="commit-question">"If this roof looks exactly the same next monsoon season — would that concern you?"</div>
+      <div class="commit-question">"First big storm of the season is coming no matter what. Would you rather watch it from your couch — or spend it hoping the ceiling holds?"</div>
       <div class="commit-btns">
-        <button class="commit-yes" onclick="storeCommit(4,'yes')">✓ Yes, It Would</button>
-        <button class="commit-no" onclick="storeCommit(4,'no')">Not sure</button>
+        <button class="commit-yes" onclick="storeCommit(4,'yes')">✓ Watch From the Couch</button>
+        <button class="commit-no" onclick="storeCommit(4,'no')">I'll take my chances</button>
       </div>
-      <div class="commit-stored" id="c-stored-4"><span class="commit-stored-icon">✓</span><span class="commit-stored-txt">Commitment stored</span></div>
+      <div class="commit-stored" id="c-stored-4"><span class="commit-stored-icon">✓</span><span class="commit-stored-txt">✓ Noted</span></div>
     </div>
   </div>
 </div>
@@ -860,8 +903,8 @@ html,body { width:100%; height:100%; background:var(--navy); font-family:"Barlow
 <div class="screen" id="screen-solution">
   <div class="inner">
     <div class="eyebrow">Chapter 06</div><div class="gold-line"></div>
-    <div class="big-title">YOUR<br><span>SOLUTION</span></div>
-    <p style="font-size:13px;color:var(--gray2);line-height:1.65;margin-bottom:20px;">Every feature we're recommending exists to solve a specific problem you have. Here's what that looks like.</p>
+    <div class="big-title">THIS IS<br>YOUR<br><span>SOLUTION</span></div>
+    <p style="font-size:13px;color:var(--gray2);line-height:1.65;margin-bottom:20px;">"I want to walk you through exactly what we're recommending and why. Every single item connects back to a problem we found on your specific roof — nothing more, nothing less."</p>
     <div class="sol-flow" id="sol-flow-container">
       <!-- Populated by JS based on scope -->
     </div>
@@ -927,12 +970,12 @@ html,body { width:100%; height:100%; background:var(--navy); font-family:"Barlow
       </div>
     </div>
     <div class="commit-box">
-      <div class="commit-question">"If all three of these companies charged the exact same price — which one would you choose?"</div>
+      <div class="commit-question">"If all three of these companies walked out of your house right now and gave you the exact same price — which one would you call back tomorrow?"</div>
       <div class="commit-btns">
-        <button class="commit-yes" onclick="storeCommit(5,'certified')">✓ Certified</button>
-        <button class="commit-no" onclick="storeCommit(5,'other')">Need more info</button>
+        <button class="commit-yes" onclick="storeCommit(5,'certified')">✓ Certified — No Question</button>
+        <button class="commit-no" onclick="storeCommit(5,'other')">I'd need to think about it</button>
       </div>
-      <div class="commit-stored" id="c-stored-5"><span class="commit-stored-icon">✓</span><span class="commit-stored-txt">Commitment stored</span></div>
+      <div class="commit-stored" id="c-stored-5"><span class="commit-stored-icon">✓</span><span class="commit-stored-txt">✓ Noted</span></div>
     </div>
   </div>
 </div>
@@ -943,33 +986,33 @@ html,body { width:100%; height:100%; background:var(--navy); font-family:"Barlow
 <div class="screen" id="screen-after">
   <div class="inner">
     <div class="eyebrow">Chapter 08</div><div class="gold-line"></div>
-    <div class="big-title">IMAGINE<br>NEXT<br><span>MONSOON</span></div>
-    <p style="font-size:14px;color:var(--gray2);line-height:1.6;margin-bottom:20px;font-style:italic;">Here's what life looks like 60 days from now — after your project is complete.</p>
+    <div class="big-title">SIXTY DAYS<br>FROM NOW<br><span>THIS IS YOUR LIFE</span></div>
+    <p style="font-size:14px;color:var(--gray2);line-height:1.6;margin-bottom:20px;font-style:italic;">"Close your eyes for a second. It's July. Storm rolls in at 4pm. Here's what your evening looks like."</p>
     <div class="card">
       <div class="after-item">
-        <div class="after-icon">✅</div>
-        <div><div class="after-title">No Leaks</div><div class="after-body">First storm hits. You watch the rain from your window, not your ceiling. Veer Ultimate Ultra redirects every drop.</div></div>
+        <div class="after-icon">🌧️</div>
+        <div><div class="after-title">The Storm Hits — You Don't Move</div><div class="after-body">You hear it on the roof. You don't grab a bucket. You don't run to the garage. You just watch. Because you know what's under those tiles — and it's Veer Ultimate Ultra.</div></div>
       </div>
       <div class="after-item">
-        <div class="after-icon">🪣</div>
-        <div><div class="after-title">No Buckets</div><div class="after-body">You won't be calling an emergency roofer during a July storm. Your weekends stay yours.</div></div>
+        <div class="after-icon">📵</div>
+        <div><div class="after-title">No Panic Calls to a Roofer at 9pm</div><div class="after-body">You won't be Googling "emergency roofer Scottsdale" at midnight. You won't be leaving a voicemail nobody returns. Your roof already handled it.</div></div>
       </div>
       <div class="after-item">
-        <div class="after-icon">💰</div>
-        <div><div class="after-title">No Emergency Repairs</div><div class="after-body">Emergency roofing in the middle of monsoon season costs 2–3x normal rates. That exposure is gone.</div></div>
+        <div class="after-icon">💸</div>
+        <div><div class="after-title">No Emergency Bill That Ruins the Month</div><div class="after-body">Emergency roofing mid-monsoon costs 2–3x normal rates — if you can even find someone. That conversation is gone. Permanently.</div></div>
       </div>
       <div class="after-item">
         <div class="after-icon">📈</div>
-        <div><div class="after-title">Increased Property Value</div><div class="after-body">A documented, warranted roof replacement is a selling point. Buyers pay a premium. Appraisers notice.</div></div>
+        <div><div class="after-title">Your Home Is Worth More</div><div class="after-body">A documented, warranted roof replacement from a licensed contractor adds real equity. Appraisers see it. Buyers pay for it. It's not an expense — it's an asset.</div></div>
       </div>
       <div class="after-item">
         <div class="after-icon">📄</div>
-        <div><div class="after-title">Transferable Warranty</div><div class="after-body">If you ever sell, the Veer lifetime warranty transfers. It becomes a marketing asset on your listing.</div></div>
+        <div><div class="after-title">A Document That Travels With the Home</div><div class="after-body">If you ever sell, the Veer lifetime warranty transfers to the new owner. That's not a marketing line — it's a selling point your agent will put in the listing.</div></div>
       </div>
     </div>
     <div class="goals-display show" id="goals-recap">
-      <div class="gd-title">Connecting to YOUR Goals</div>
-      <div id="gd-items"><!-- Populated from discovery answers --></div>
+      <div class="gd-title">This Is What You Told Me You Wanted</div>
+      <div id="gd-items"></div>
     </div>
   </div>
 </div>
@@ -980,29 +1023,29 @@ html,body { width:100%; height:100%; background:var(--navy); font-family:"Barlow
 <div class="screen" id="screen-payment">
   <div class="inner">
     <div class="eyebrow">Chapter 09</div><div class="gold-line"></div>
-    <div class="big-title">HOW DO<br>YOU USUALLY<br><span>PAY?</span></div>
-    <p style="font-size:14px;color:var(--gray2);line-height:1.6;margin-bottom:20px;font-style:italic;">"Most homeowners use one of three options. Which feels most comfortable for you?"</p>
+    <div class="big-title">LET'S TALK<br>ABOUT HOW<br><span>THIS WORKS</span></div>
+    <p style="font-size:14px;color:var(--gray2);line-height:1.6;margin-bottom:20px;font-style:italic;">"Before I show you the number — I want to make sure we have the right option ready. Most homeowners are surprised how flexible this is."</p>
     <div class="pay-opt" id="po0" onclick="pickPayment(0)">
       <div class="pay-icon">💵</div>
       <div style="flex:1;">
         <div class="pay-title">Cash / Check / Zelle</div>
-        <div class="pay-detail">Pay in full at completion. No interest. Simple.</div>
+        <div class="pay-detail">Pay at completion. No interest, no fees, no paperwork. Simple as it gets.</div>
       </div>
       <div class="pay-check" id="pchk0"></div>
     </div>
     <div class="pay-opt" id="po1" onclick="pickPayment(1)">
       <div class="pay-icon">🏦</div>
       <div style="flex:1;">
-        <div class="pay-title">Financing</div>
-        <div class="pay-detail">$1K–$325K · Up to 30 years · Soft pull · As low as $X/mo · HFS Financial</div>
+        <div class="pay-title">Monthly Payments — HFS Financial</div>
+        <div class="pay-detail">$1K–$325K · Up to 30 years · Soft pull only — no hit to your score · Approval in minutes · Most popular option</div>
       </div>
       <div class="pay-check" id="pchk1"></div>
     </div>
     <div class="pay-opt" id="po2" onclick="pickPayment(2)">
       <div class="pay-icon">🏠</div>
       <div style="flex:1;">
-        <div class="pay-title">Home Equity Line of Credit</div>
-        <div class="pay-detail">$25K min · Lowest rate available · 10–30yr terms · 5-min approval · $0 out of pocket</div>
+        <div class="pay-title">Home Equity — Lowest Rate Available</div>
+        <div class="pay-detail">$25K min · Rate tied to prime — typically beats any other option · 5-min approval · $0 out of pocket at signing</div>
       </div>
       <div class="pay-check" id="pchk2"></div>
     </div>
@@ -1010,12 +1053,12 @@ html,body { width:100%; height:100%; background:var(--navy); font-family:"Barlow
       <div class="pay-icon">💳</div>
       <div style="flex:1;">
         <div class="pay-title">Credit Card</div>
-        <div class="pay-detail">All major cards accepted. 3% processing fee applies.</div>
+        <div class="pay-detail">All major cards. 3% processing fee. Good for rewards points on smaller scopes.</div>
       </div>
       <div class="pay-check" id="pchk3"></div>
     </div>
     <div style="margin-top:8px;padding:14px 16px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid rgba(138,155,176,.1);">
-      <div style="font-size:12px;color:var(--gray);line-height:1.6;font-style:italic;">Note: We are not discussing the total yet. We're making sure the right option is ready when we need it.</div>
+      <div style="font-size:12px;color:var(--gray);line-height:1.6;">Most homeowners are surprised how affordable this is on a monthly basis. We'll look at exact numbers on the next page.</div>
     </div>
   </div>
 </div>
@@ -1124,8 +1167,12 @@ html,body { width:100%; height:100%; background:var(--navy); font-family:"Barlow
       <!-- Populated by JS -->
     </div>
     <div class="script-box">
-      <div class="script-txt">"Based on everything you've shared today — does this still feel like the right solution for your home?"</div>
-      <div class="script-tag">— Pause. Wait for their answer. —</div>
+      <div class="script-txt">"Here's what I heard from you today. I want to make sure I got it right — because this decision should be based on your situation, not mine."</div>
+      <div class="script-tag">— Read commitments back slowly. Pause after each one. Let them nod. —</div>
+    </div>
+    <div class="script-box" style="margin-top:8px;">
+      <div class="script-txt">"Based on everything you just confirmed — does moving forward today feel like the right call for your family?"</div>
+      <div class="script-tag">— Pause. Say nothing. The next person who speaks loses. —</div>
     </div>
     <div class="commit-box">
       <div class="commit-question">Homeowner response:</div>
@@ -1133,7 +1180,7 @@ html,body { width:100%; height:100%; background:var(--navy); font-family:"Barlow
         <button class="commit-yes" onclick="storeCommit(6,'yes');nextScreen()">✓ Yes — Let's Go</button>
         <button class="commit-no" onclick="openObj()">Handle Objection</button>
       </div>
-      <div class="commit-stored" id="c-stored-6"><span class="commit-stored-icon">✓</span><span class="commit-stored-txt">Moving to close</span></div>
+      <div class="commit-stored" id="c-stored-6"><span class="commit-stored-icon">✓</span><span class="commit-stored-txt">✓ Got it</span></div>
     </div>
   </div>
 </div>
@@ -1144,7 +1191,7 @@ html,body { width:100%; height:100%; background:var(--navy); font-family:"Barlow
 <div class="screen" id="screen-close">
   <div class="inner">
     <div class="eyebrow">Chapter 12</div><div class="gold-line"></div>
-    <div class="big-title">RESERVE<br>YOUR<br><span>SLOT</span></div>
+    <div class="big-title">LET'S GET<br>YOU ON THE<br><span>SCHEDULE</span></div>
     <div class="card card-gold" style="margin-bottom:16px;">
       <div class="sum-title" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;">Project Summary</div>
       <div style="display:flex;flex-direction:column;gap:7px;">
@@ -1247,7 +1294,7 @@ html,body { width:100%; height:100%; background:var(--navy); font-family:"Barlow
     <div class="eyebrow">Chapter 16</div><div class="gold-line"></div>
     <div class="big-title">ONE MORE<br><span>THING</span></div>
     <div class="card card-gold" style="margin-bottom:20px;">
-      <div style="font-size:14px;color:var(--off);line-height:1.7;font-style:italic;">"Monsoon season is here for everyone in your neighborhood. Who are two neighbors or family members that would appreciate the same roof inspection before the first storm hits?"</div>
+      <div style="font-size:14px;color:var(--off);line-height:1.7;font-style:italic;">"Last thing before we wrap up — and this isn't a sales thing, this is a neighbor thing. Monsoon season doesn't care which house it hits. Who's one or two people you know — a neighbor, a family member — that you'd want to have the same peace of mind you have right now? I'll reach out, run the same honest inspection, and let them decide. No pressure either way."</div>
     </div>
     <div class="ref-input-row">
       <div class="ref-slot" id="ref-slot-0">
@@ -1498,7 +1545,7 @@ function renderCommitBar() {
 // SCREEN ENTER HOOKS
 // ═══════════════════════════════════════════════════════
 function onScreenEnter(id) {
-  if(id==='screen-trust'){ document.getElementById('trust-rep-name').textContent = REPS[ST.rep].name; }
+  if(id==='screen-trust'){ document.getElementById('trust-rep-name').textContent = REPS[ST.rep].name; initSocialMap(); }
   if(id==='screen-monsoon'){ buildRiskMeter(); }
   if(id==='screen-solution'){ buildSolutionFlow(); }
   if(id==='screen-after'){ buildGoalsRecap(); }
@@ -1898,13 +1945,13 @@ function updateCloseSummary() {
 // RECAP COMMITS
 // ═══════════════════════════════════════════════════════
 var COMMIT_LABELS = [
-  function(){ return 'You\'re open to moving forward if the solution fits your needs.'; },
-  function(){ return 'You value communication and accountability on a project this size.'; },
-  function(){ return 'You agreed the issues we found are unlikely to improve on their own.'; },
-  function(){ return 'It makes more sense to act before the roof fails, not after.'; },
-  function(){ return 'If the roof looks the same next monsoon — that would concern you.'; },
-  function(){ return 'If all three companies charged the same price, you\'d choose Certified.'; },
-  function(){ return 'You\'re ready to move forward.'; },
+  function(){ return 'You said you\'d be open to hearing the full picture if we found something real — and we did.'; },
+  function(){ return 'You agreed that who does the work matters just as much as the price.'; },
+  function(){ return 'In your gut, you said this feels like something that costs more the longer it sits.'; },
+  function(){ return 'You said spending the quote now makes more sense than spending 3–4x after a monsoon decides for you.'; },
+  function(){ return 'You said you\'d rather watch the storm from the couch than spend it hoping the ceiling holds.'; },
+  function(){ return 'If all three companies charged the same, you said you\'d call Certified back — no question.'; },
+  function(){ return 'You\'ve confirmed this feels like the right call for your family.'; },
   function(){ return 'Production slot reserved.'; }
 ];
 function buildRecap() {
@@ -1929,28 +1976,28 @@ function buildRecap() {
 // ═══════════════════════════════════════════════════════
 var OBJ_DATA = {
   price: {
-    q: '"Compared to doing nothing — or compared to another contractor?"',
-    discovery: '"What specifically feels high — the overall number, or the monthly payment?"',
-    reframe: 'If we can show the monthly payment is less than your cable and internet combined, does that change the conversation?',
-    backup: 'We have financing that starts at $—/mo over 30 years. Would it help to see that number right now?'
+    q: '"Help me understand — when you say the price, are you comparing it to another quote, or does the number itself feel uncomfortable?"',
+    discovery: '"If I could show you this for $X a month — less than a car payment — would the total number still feel like the obstacle?"',
+    reframe: 'Price only feels high when the value isn\'t clear yet. You told me earlier you want it done right — what would it cost you if a cheap job fails during monsoon and you\'re back to square one?',
+    backup: 'We have 30-year financing that puts this at $—/mo. Most people spend more than that on streaming services and dining out combined. Want me to pull up the application right now?'
   },
   spouse: {
-    q: '"What do you think your spouse would need to see to feel comfortable with this decision?"',
-    discovery: '"Can we get them on a quick call right now so they have the same information you do?"',
-    reframe: 'The goal isn\'t to pressure — it\'s so nobody makes a decision with incomplete information.',
-    backup: 'I can send a full proposal to both of you right now — they\'ll have everything they need.'
+    q: '"Totally understand — what do you think your spouse\'s biggest question would be? Is it the money, who\'s doing the work, or the timing?"',
+    discovery: '"Can we call them right now? I\'d rather answer their questions while I\'m here than have you try to explain everything without the visuals."',
+    reframe: 'You\'ve seen everything. You\'ve asked every question. You know the roof needs this. Getting your spouse on the phone right now means they get the same information — and you both decide together, today.',
+    backup: 'Let me send both of you the full summary right now. When they see the CompanyCam photos, the warranty documents, and the monthly payment — what do you think they\'ll say?'
   },
   think: {
-    q: '"What specifically would you like to think through?"',
-    discovery: '"Is it the scope, the investment, the timing, or something else?"',
-    reframe: 'Thinking through it is smart. The challenge is that monsoon season doesn\'t pause while we\'re deciding.',
-    backup: 'What would it take to feel comfortable making this decision today?'
+    q: '"Of course — what specifically do you want to think through? Is it the price, the timing, whether this is the right company, or something else?"',
+    discovery: '"Here\'s what I\'ve found: when someone wants to think about it, it\'s usually one thing that isn\'t quite resolved yet. What\'s that one thing for you?"',
+    reframe: 'I completely respect that. The challenge is that the roof doesn\'t wait while you\'re thinking. Monsoon season is already here. The longer we wait to schedule, the tighter the calendar gets — and my crews book fast this time of year.',
+    backup: 'What would need to be true for you to feel comfortable saying yes right now? Tell me that one thing and let\'s solve it together.'
   },
   bid: {
-    q: '"Besides price — what other differences did you notice when you got the other estimate?"',
-    discovery: '"Did the other company offer in-house crews? Lifetime warranty? CompanyCam documentation?"',
-    reframe: 'Price is rarely the only difference. When you\'re comparing, make sure you\'re comparing the same thing.',
-    backup: 'What would the right number look like for you today?'
+    q: '"Smart move — when you got that other quote, besides the price, what did you notice about the company? Did they have in-house crews? Did they show you photos from their inspections?"',
+    discovery: '"Here\'s a question worth asking the other company: are they certified to install the Veer Ultimate Ultra system and register the lifetime warranty in your name? Because if they\'re not certified, you can\'t get that warranty regardless of what they promise."',
+    reframe: 'Getting multiple bids makes sense. Just make sure you\'re comparing the same thing. A $3,000 cheaper quote that comes with subcontractors, no photos, and a 1-year workmanship warranty isn\'t actually cheaper — it\'s a gamble.',
+    backup: 'What\'s the number that would make this a clear yes for you today? Tell me that and let\'s see what we can do.'
   }
 };
 
@@ -2049,6 +2096,36 @@ function submitAll() {
     history.unshift(record);
     if(history.length > 200) history = history.slice(0,200);
     localStorage.setItem('cc_sessions', JSON.stringify(history));
+
+    // ── Write completed job to Firestore so the social proof map auto-populates ──
+    if (ST.hwAddr && ST.totalInvest > 0) {
+      var geocoder2 = new google.maps.Geocoder();
+      geocoder2.geocode({ address: ST.hwAddr }, function(gRes, gStatus) {
+        if (gStatus === 'OK' && gRes[0]) {
+          var gl = gRes[0].geometry.location;
+          var jobDoc = {
+            fields: {
+              address: { stringValue: ST.hwAddr },
+              lat:     { doubleValue: gl.lat() },
+              lng:     { doubleValue: gl.lng() },
+              scope:   { stringValue: RATES[ST.scope] ? RATES[ST.scope].label : ST.scope },
+              squares: { integerValue: String(Math.round(ST.squares || 0)) },
+              grade:   { stringValue: ST.grade || '' },
+              total:   { doubleValue: ST.totalInvest || 0 },
+              rep:     { stringValue: REPS[ST.rep].name },
+              month:   { stringValue: new Date().toLocaleString('en-US',{month:'short',year:'numeric'}) },
+              closedAt:{ stringValue: new Date().toISOString() }
+            }
+          };
+          var fsUrl = FS_BASE + '/completed_jobs?key=' + FIREBASE_CONFIG.apiKey;
+          fetch(fsUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(jobDoc)
+          }).catch(function(){});
+        }
+      });
+    }
   } catch(e){}
   setTimeout(function(){
     document.getElementById('saving').classList.remove('show');
@@ -2110,6 +2187,336 @@ function newAppt() {
 }
 
 function showDashboard() { goScreen('screen-dashboard'); }
+
+// ═══════════════════════════════════════════════════════
+// FIREBASE / FIRESTORE — live job data
+// ═══════════════════════════════════════════════════════
+var FIREBASE_CONFIG = {
+  apiKey:            'AIzaSyCN--bAJt6DXczjvHlsJt4U-Uak9cuZcik',
+  authDomain:        'certified-platform-6e939.firebaseapp.com',
+  projectId:         'certified-platform-6e939',
+  storageBucket:     'certified-platform-6e939.firebasestorage.app',
+  messagingSenderId: '1083685076297',
+  appId:             '1:1083685076297:web:902a2be502c5671987ae98'
+};
+var MAPS_KEY = 'AIzaSyDQi5tzQCd-QdL7wUBsWkDZKbF3hT2l444';
+
+// Firestore REST endpoint — no SDK needed, avoids CSP issues on iPad
+var FS_BASE = 'https://firestore.googleapis.com/v1/projects/certified-platform-6e939/databases/(default)/documents';
+
+// ═══════════════════════════════════════════════════════
+// ADDRESS AUTOCOMPLETE — Places API (New) via fetch
+// Works on GitHub Pages, no CORS issues
+// ═══════════════════════════════════════════════════════
+var acTimer;
+var acSessionToken = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36);
+
+function initMapsSDK() {
+  // SDK loaded — nothing extra needed, autocomplete uses fetch below
+}
+
+function addrInput(v) {
+  clearTimeout(acTimer);
+  var list = document.getElementById('ac-list');
+  if (!v || v.length < 2) { list.classList.remove('show'); list.innerHTML = ''; return; }
+
+  acTimer = setTimeout(function() {
+    fetch('https://places.googleapis.com/v1/places:autocomplete', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': MAPS_KEY,
+        'X-Goog-FieldMask': 'suggestions.placePrediction.text,suggestions.placePrediction.placeId,suggestions.placePrediction.structuredFormat'
+      },
+      body: JSON.stringify({
+        input: v,
+        sessionToken: acSessionToken,
+        includedRegionCodes: ['us'],
+        includedPrimaryTypes: ['street_address', 'premise', 'subpremise']
+      })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      list.innerHTML = '';
+      if (!d.suggestions || !d.suggestions.length) { list.classList.remove('show'); return; }
+      d.suggestions.slice(0, 6).forEach(function(s) {
+        var p = s.placePrediction;
+        var main = p.structuredFormat ? p.structuredFormat.mainText.text : p.text.text;
+        var sec  = p.structuredFormat ? p.structuredFormat.secondaryText.text : '';
+        var el = document.createElement('div');
+        el.className = 'ac-item';
+        el.innerHTML = '<span style="color:var(--white);font-weight:600;">' + main + '</span>' +
+                       '<span style="color:var(--gray);font-size:11px;margin-left:6px;">' + sec + '</span>';
+        el.onclick = function() {
+          var full = p.text.text;
+          document.getElementById('hw-addr').value = full;
+          ST.hwAddr = full;
+          list.classList.remove('show');
+          list.innerHTML = '';
+          acSessionToken = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36);
+        };
+        list.appendChild(el);
+      });
+      list.classList.add('show');
+    })
+    .catch(function() { list.classList.remove('show'); });
+  }, 220);
+}
+
+// ═══════════════════════════════════════════════════════
+// SOCIAL PROOF JOB MAP — live from Firestore
+// Falls back to curated seed jobs if Firestore is empty
+// ═══════════════════════════════════════════════════════
+
+// Seed jobs — shown while Firestore loads AND used as fallback
+// Replace with real jobs; Firestore will progressively take over
+var SEED_JOBS = [
+  { addr:'E Cactus Rd, Scottsdale AZ',        lat:33.5969, lng:-111.9084, scope:'Tile D&R',    mo:'Apr 2026', sq:28, grade:'C' },
+  { addr:'N Tatum Blvd, Phoenix AZ',           lat:33.6012, lng:-111.9742, scope:'Tile D&R',    mo:'Mar 2026', sq:31, grade:'D' },
+  { addr:'E Shea Blvd, Scottsdale AZ',         lat:33.5814, lng:-111.9023, scope:'Shingle R&R', mo:'May 2026', sq:22, grade:'D' },
+  { addr:'E Frank Lloyd Wright, Scottsdale AZ',lat:33.6124, lng:-111.8902, scope:'Tile D&R',    mo:'May 2026', sq:35, grade:'D' },
+  { addr:'McCormick Ranch, Scottsdale AZ',     lat:33.5627, lng:-111.8923, scope:'Tile R&R',    mo:'Feb 2026', sq:41, grade:'F' },
+  { addr:'Kierland Commons, Scottsdale AZ',    lat:33.6234, lng:-111.9245, scope:'Tile D&R',    mo:'Jan 2026', sq:29, grade:'C' },
+  { addr:'N Scottsdale Rd, Paradise Valley AZ',lat:33.5388, lng:-111.9427, scope:'Tile R&R',    mo:'Apr 2026', sq:52, grade:'D' },
+  { addr:'Gainey Ranch, Scottsdale AZ',        lat:33.5742, lng:-111.9013, scope:'Tile D&R',    mo:'Feb 2026', sq:33, grade:'C' },
+  { addr:'Desert Ridge, Phoenix AZ',           lat:33.6712, lng:-111.9823, scope:'Tile D&R',    mo:'May 2026', sq:27, grade:'D' },
+  { addr:'Pinnacle Peak Rd, Scottsdale AZ',    lat:33.6834, lng:-111.8912, scope:'Tile D&R',    mo:'Jan 2026', sq:38, grade:'D' },
+  { addr:'N Hayden Rd, Scottsdale AZ',         lat:33.5521, lng:-111.9067, scope:'Shingle R&R', mo:'Mar 2026', sq:19, grade:'C' },
+  { addr:'Troon North, Scottsdale AZ',         lat:33.7012, lng:-111.8634, scope:'Tile D&R',    mo:'Jun 2026', sq:44, grade:'C' }
+];
+
+var allJobs       = [];   // populated from Firestore + seeds
+var socialMap     = null;
+var socialMapInited = false;
+var hwLatLng      = null;
+var mapMarkers    = [];
+var mapInfoWindow = null;
+
+function initSocialMap() {
+  // Always re-render when entering this screen (address may have changed)
+  socialMapInited = false;
+  buildSocialMap();
+}
+
+function buildSocialMap() {
+  if (socialMapInited) return;
+  if (!window.google || !window.google.maps) {
+    // SDK not ready — retry in 800ms
+    setTimeout(buildSocialMap, 800); return;
+  }
+  socialMapInited = true;
+
+  var defaultCenter = { lat: 33.5947, lng: -111.9261 };
+
+  var mapStyles = [
+    { elementType:'geometry',              stylers:[{ color:'#0d1f35' }] },
+    { elementType:'labels.text.fill',      stylers:[{ color:'#8a9bb0' }] },
+    { elementType:'labels.text.stroke',    stylers:[{ color:'#0a1928' }] },
+    { featureType:'road',                  elementType:'geometry', stylers:[{ color:'#1a3455' }] },
+    { featureType:'road.arterial',         elementType:'geometry', stylers:[{ color:'#1e3d64' }] },
+    { featureType:'road.highway',          elementType:'geometry', stylers:[{ color:'#243f69' }] },
+    { featureType:'road.local',            elementType:'labels',   stylers:[{ visibility:'off' }] },
+    { featureType:'water',                 elementType:'geometry', stylers:[{ color:'#0B1F3A' }] },
+    { featureType:'landscape',             elementType:'geometry', stylers:[{ color:'#112340' }] },
+    { featureType:'poi',                   stylers:[{ visibility:'off' }] },
+    { featureType:'transit',               stylers:[{ visibility:'off' }] },
+    { featureType:'administrative.locality',elementType:'labels.text.fill', stylers:[{ color:'#C9A84C' }] }
+  ];
+
+  if (!socialMap) {
+    socialMap = new google.maps.Map(document.getElementById('social-map'), {
+      zoom: 12, center: defaultCenter,
+      disableDefaultUI: true, zoomControl: true,
+      gestureHandling: 'cooperative', styles: mapStyles
+    });
+    mapInfoWindow = new google.maps.InfoWindow();
+  }
+
+  // Step 1: geocode homeowner address
+  geocodeHomeowner(function(hwLL) {
+    hwLatLng = hwLL;
+
+    // Step 2: load Firestore jobs, merge with seeds, render nearest 3–7
+    loadFirestoreJobs(function(fsJobs) {
+      // Merge: Firestore jobs take priority, seeds fill gaps
+      var merged = fsJobs.concat(SEED_JOBS);
+      // Dedupe by proximity (>100m apart)
+      var deduped = [];
+      merged.forEach(function(j) {
+        var dup = deduped.some(function(d) {
+          return haversineKm(d.lat, d.lng, j.lat, j.lng) < 0.1;
+        });
+        if (!dup) deduped.push(j);
+      });
+      allJobs = deduped;
+      renderMapPins(hwLL);
+    });
+  });
+}
+
+function geocodeHomeowner(cb) {
+  if (!ST.hwAddr) { cb(null); return; }
+  var geocoder = new google.maps.Geocoder();
+  geocoder.geocode({ address: ST.hwAddr }, function(results, status) {
+    if (status === 'OK' && results[0]) {
+      var loc = results[0].geometry.location;
+      cb({ lat: loc.lat(), lng: loc.lng() });
+    } else { cb(null); }
+  });
+}
+
+function loadFirestoreJobs(cb) {
+  // Query Firestore REST for completed_jobs collection
+  var url = FS_BASE + '/completed_jobs?pageSize=200&key=' + FIREBASE_CONFIG.apiKey;
+  fetch(url)
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      var jobs = [];
+      if (d.documents) {
+        d.documents.forEach(function(doc) {
+          var f = doc.fields || {};
+          var lat = f.lat  ? parseFloat(f.lat.doubleValue  || f.lat.integerValue  || 0) : 0;
+          var lng = f.lng  ? parseFloat(f.lng.doubleValue  || f.lng.integerValue  || 0) : 0;
+          if (!lat || !lng) return; // skip if no geo
+          jobs.push({
+            addr:  f.address ? (f.address.stringValue || '') : '',
+            lat:   lat,
+            lng:   lng,
+            scope: f.scope   ? (f.scope.stringValue   || 'Roofing') : 'Roofing',
+            mo:    f.month   ? (f.month.stringValue    || '')        : '',
+            sq:    f.squares ? parseInt(f.squares.integerValue || f.squares.doubleValue || 0) : 0,
+            grade: f.grade   ? (f.grade.stringValue    || '')        : ''
+          });
+        });
+      }
+      cb(jobs);
+    })
+    .catch(function() { cb([]); }); // network fail — fall back to seeds
+}
+
+function renderMapPins(hwLL) {
+  // Clear existing markers
+  mapMarkers.forEach(function(m) { m.setMap(null); });
+  mapMarkers = [];
+
+  var bounds = new google.maps.LatLngBounds();
+  var jobsToShow = [];
+
+  if (hwLL) {
+    // Sort all jobs by distance from homeowner
+    var withDist = allJobs.map(function(j) {
+      return { job: j, miles: haversineKm(hwLL.lat, hwLL.lng, j.lat, j.lng) * 0.621371 };
+    });
+    withDist.sort(function(a, b) { return a.miles - b.miles; });
+
+    // Take 3–7 closest within 5 miles
+    var nearby = withDist.filter(function(x) { return x.miles <= 5; });
+    var count  = Math.min(Math.max(nearby.length, 0), 7);
+    if (count < 3) {
+      // Broaden to 15 miles if sparse
+      nearby = withDist.filter(function(x) { return x.miles <= 15; });
+      count  = Math.min(nearby.length, 7);
+    }
+    jobsToShow = nearby.slice(0, count).map(function(x) { return x.job; });
+
+    // Update counters
+    var c1  = withDist.filter(function(x) { return x.miles <= 1; }).length;
+    var c5  = withDist.filter(function(x) { return x.miles <= 5; }).length;
+    document.getElementById('map-count-mile').textContent  = c1 || '—';
+    document.getElementById('map-count-3mile').textContent = c5 || '—';
+
+    // Neighborhood name via reverse geocode
+    var geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ location: hwLL }, function(r, s) {
+      if (s === 'OK' && r[0]) {
+        var nbhd = '';
+        r[0].address_components.forEach(function(c) {
+          if (!nbhd && (c.types.indexOf('neighborhood') > -1 || c.types.indexOf('sublocality') > -1))
+            nbhd = c.long_name;
+        });
+        if (!nbhd) r[0].address_components.forEach(function(c) {
+          if (!nbhd && c.types.indexOf('locality') > -1) nbhd = c.long_name;
+        });
+        document.getElementById('map-neighborhood-txt').textContent =
+          c5 + ' completed job' + (c5 !== 1 ? 's' : '') + ' within 5 miles of ' + (nbhd || 'your home');
+      }
+    });
+
+    // Homeowner pin — animated green pulse
+    var hwMarker = new google.maps.Marker({
+      position: hwLL, map: socialMap, zIndex: 999, title: 'This Home',
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        fillColor: '#2ecc71', fillOpacity: 1,
+        strokeColor: '#fff', strokeWeight: 2.5, scale: 10
+      }
+    });
+    mapMarkers.push(hwMarker);
+    bounds.extend(hwLL);
+
+  } else {
+    // No address — show all seeds
+    jobsToShow = SEED_JOBS.slice(0, 7);
+    document.getElementById('map-count-mile').textContent  = '—';
+    document.getElementById('map-count-3mile').textContent = SEED_JOBS.length + '+';
+    document.getElementById('map-neighborhood-txt').textContent = 'Scottsdale / North Phoenix area';
+  }
+
+  // Gold job pins
+  var pinIcon = {
+    path: 'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z',
+    fillColor: '#C9A84C', fillOpacity: 1,
+    strokeColor: '#0B1F3A', strokeWeight: 1.5,
+    scale: 1.6, anchor: new google.maps.Point(12, 22)
+  };
+
+  jobsToShow.forEach(function(job, i) {
+    var marker = new google.maps.Marker({
+      position: { lat: job.lat, lng: job.lng },
+      map: socialMap, icon: pinIcon,
+      title: job.addr, zIndex: 100 - i,
+      animation: google.maps.Animation.DROP
+    });
+    mapMarkers.push(marker);
+    bounds.extend(marker.position);
+
+    marker.addListener('click', function() {
+      mapInfoWindow.setContent(
+        '<div style="background:#0B1F3A;color:#fff;padding:12px 16px;border-radius:8px;min-width:200px;max-width:260px;font-family:Arial,sans-serif;box-shadow:0 4px 20px rgba(0,0,0,.4);">' +
+        '<div style="color:#C9A84C;font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:6px;">✓ COMPLETED JOB</div>' +
+        '<div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:3px;">' + (job.addr || 'Scottsdale Area') + '</div>' +
+        '<div style="font-size:12px;color:#C9A84C;margin-bottom:4px;font-weight:600;">' + job.scope + (job.mo ? ' · ' + job.mo : '') + '</div>' +
+        (job.sq  ? '<div style="font-size:11px;color:#8a9bb0;">' + job.sq + ' squares</div>' : '') +
+        (job.grade ? '<div style="font-size:11px;color:#8a9bb0;">Grade ' + job.grade + ' → Certified ✓</div>' : '') +
+        '<div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(201,168,76,.15);font-size:10px;color:#8a9bb0;">Veer Ultimate Ultra · Lifetime Warranty</div>' +
+        '</div>'
+      );
+      mapInfoWindow.open(socialMap, marker);
+    });
+  });
+
+  // Fit map to show all pins + homeowner
+  if (!bounds.isEmpty()) {
+    socialMap.fitBounds(bounds, { top: 30, right: 30, bottom: 30, left: 30 });
+    // Don't zoom in too tight on a single pin
+    google.maps.event.addListenerOnce(socialMap, 'idle', function() {
+      if (socialMap.getZoom() > 14) socialMap.setZoom(13);
+    });
+  }
+
+  document.getElementById('map-loading').style.display = 'none';
+  document.getElementById('map-job-count').textContent  = jobsToShow.length + ' nearby';
+}
+
+function haversineKm(lat1, lon1, lat2, lon2) {
+  var R = 6371;
+  var dLat = (lat2 - lat1) * Math.PI / 180;
+  var dLon = (lon2 - lon1) * Math.PI / 180;
+  var a = Math.sin(dLat/2)*Math.sin(dLat/2) +
+    Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*
+    Math.sin(dLon/2)*Math.sin(dLon/2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
 
 // ═══════════════════════════════════════════════════════
 // ROOF WALK TIMER
@@ -2205,71 +2612,105 @@ function sendSummaryEmail() {
   var dateStr  = new Date().toLocaleDateString('en-US', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
   var payLabel = ST.payment !== null ? PAY_LABELS[ST.payment] : '—';
 
-  // Branded HTML email body
+  // Premium handcrafted confirmation email — warm, personal, earned
+  var firstName = ST.hwName ? ST.hwName.split(' ')[0] : 'there';
   var htmlBody = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>' +
-    'body{margin:0;padding:0;background:#f4f4f4;font-family:Arial,sans-serif;}' +
-    '.wrap{max-width:600px;margin:0 auto;background:#fff;}' +
-    '.hdr{background:#0B1F3A;padding:28px 32px;}' +
-    '.hdr-co{color:#C9A84C;font-size:11px;letter-spacing:4px;text-transform:uppercase;margin-bottom:2px;}' +
-    '.hdr-tag{color:#8a9bb0;font-size:10px;letter-spacing:2px;text-transform:uppercase;}' +
-    '.hero{background:#0B1F3A;padding:20px 32px 28px;border-bottom:3px solid #C9A84C;}' +
-    '.hero-hed{color:#fff;font-size:26px;font-weight:700;margin-bottom:4px;}' +
-    '.hero-sub{color:#8a9bb0;font-size:12px;}' +
-    '.body{padding:28px 32px;}' +
-    '.slbl{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#C9A84C;border-bottom:1px solid #e8e0d0;padding-bottom:6px;margin:20px 0 12px;}' +
-    '.row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f0ebe0;}' +
-    '.lbl{font-size:12px;color:#888;}' +
-    '.val{font-size:13px;font-weight:700;color:#0B1F3A;text-align:right;}' +
-    '.tot-row{background:#0B1F3A;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;border-radius:6px;margin:16px 0;}' +
-    '.tot-lbl{color:#C9A84C;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}' +
-    '.tot-val{color:#C9A84C;font-size:24px;font-weight:700;}' +
-    '.wb{background:#f8f6f0;border-left:3px solid #C9A84C;padding:12px 16px;margin:8px 0;}' +
-    '.wt{font-size:13px;font-weight:700;color:#0B1F3A;margin-bottom:2px;}' +
-    '.ws{font-size:11px;color:#666;}' +
-    '.tl{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid #f0ebe0;}' +
-    '.tn{width:28px;height:28px;border-radius:50%;background:#0B1F3A;color:#C9A84C;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:28px;text-align:center;}' +
-    '.td{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#C9A84C;margin-bottom:1px;}' +
-    '.tt{font-size:13px;font-weight:700;color:#0B1F3A;}' +
-    '.cl{list-style:none;padding:0;margin:0;}' +
-    '.cl li{font-size:13px;color:#444;padding:5px 0;border-bottom:1px solid #f0ebe0;}' +
-    '.cl li:before{content:"✓ ";color:#C9A84C;font-weight:700;}' +
-    '.rb{background:#0B1F3A;border-radius:8px;padding:16px 20px;margin-top:8px;}' +
-    '.rn{color:#fff;font-size:15px;font-weight:700;margin-bottom:2px;}' +
-    '.rp{color:#C9A84C;font-size:14px;font-weight:700;}' +
-    '.rc{color:#8a9bb0;font-size:11px;margin-top:4px;}' +
-    '.ftr{background:#f4f4f4;padding:20px 32px;text-align:center;border-top:1px solid #e8e0d0;}' +
-    '.fc{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#0B1F3A;}' +
-    '.fs{font-size:11px;color:#888;margin-top:3px;}' +
-    '</style></head><body><div class="wrap">' +
-    '<div class="hdr"><div class="hdr-co">Certified Contracting LLC</div><div class="hdr-tag">ROC #364621 · KB-2 · Arizona\'s Finest</div></div>' +
-    '<div class="hero"><div class="hero-hed">You\'re On The Schedule</div><div class="hero-sub">' + dateStr + ' · Project Authorization Confirmed</div></div>' +
-    '<div class="body">' +
-    '<p style="font-size:14px;color:#444;line-height:1.7;margin-bottom:0;">Hi ' + (ST.hwName ? ST.hwName.split(' ')[0] : 'there') + ',<br><br>Thank you for choosing Certified Contracting. Below is a complete summary of your authorized project. Your start date will be confirmed within 24 hours.</p>' +
-    '<div class="slbl">Project Details</div>' +
-    '<div class="row"><span class="lbl">Homeowner</span><span class="val">' + (ST.hwName||'—') + '</span></div>' +
-    '<div class="row"><span class="lbl">Property</span><span class="val">' + (ST.hwAddr||'—') + '</span></div>' +
-    '<div class="row"><span class="lbl">Scope of Work</span><span class="val">' + scope + '</span></div>' +
-    '<div class="row"><span class="lbl">Roof Grade</span><span class="val">' + (ST.grade ? 'Grade '+ST.grade : '—') + '</span></div>' +
-    '<div class="row"><span class="lbl">Squares</span><span class="val">' + (ST.squares||'—') + '</span></div>' +
-    '<div class="row"><span class="lbl">Payment Method</span><span class="val">' + payLabel + '</span></div>' +
-    '<div class="tot-row"><span class="tot-lbl">Total Investment</span><span class="tot-val">' + total + '</span></div>' +
-    (ST.payment===1 ? '<p style="font-size:12px;color:#888;margin:0 0 12px;">Financing estimate: <strong>' + moAmt + '</strong> · 30 yr · ~7.8% APR · HFS Financial · Soft credit check · No home equity required</p>' : '') +
-    '<div class="slbl">Warranty</div>' +
-    '<div class="wb"><div class="wt">Veer Ultimate Ultra — Lifetime Manufacturer Warranty</div><div class="ws">Covers the underlayment system for the life of the home. Transferable upon sale.</div></div>' +
-    '<div class="wb"><div class="wt">5-Year Workmanship Guarantee</div><div class="ws">Certified Contracting LLC backs every installation for 5 years.</div></div>' +
-    '<div class="slbl">Production Timeline</div>' +
-    '<div class="tl"><div class="tn">1</div><div><div class="td">Day 1</div><div class="tt">Materials Delivered & Staged</div></div></div>' +
-    '<div class="tl"><div class="tn">2</div><div><div class="td">Day 2</div><div class="tt">Tear-Off — Old System Removed</div></div></div>' +
-    '<div class="tl"><div class="tn">3</div><div><div class="td">Day 3</div><div class="tt">Installation</div></div></div>' +
-    '<div class="tl"><div class="tn">4</div><div><div class="td">Day 4</div><div class="tt">QC Inspection & Magnetic Sweep</div></div></div>' +
-    '<div class="tl"><div class="tn">5</div><div><div class="td">Day 5</div><div class="tt">Final Walkthrough With You</div></div></div>' +
-    '<p style="font-size:12px;color:#888;margin-top:8px;">Your exact start date will be confirmed within 24 hours.</p>' +
-    '<div class="slbl">Why Certified Contracting</div>' +
-    '<ul class="cl"><li>100% In-House Crews — no subcontractors, ever</li><li>KB-2 Licensed & Bonded — ROC #364621</li><li>CompanyCam photo documentation every step</li><li>Dedicated Project Manager — one contact start to finish</li><li>Daily site cleanup — magnetic sweep every day</li><li>Lifetime Veer warranty + 5-year workmanship guarantee</li></ul>' +
-    '<div class="slbl">Your Direct Contact</div>' +
-    '<div class="rb"><div class="rn">' + rep.name + '</div><div class="rp">' + rep.phone + '</div><div class="rc">Certified Contracting LLC · certifiedcontractingaz.com</div></div>' +
+    'body{margin:0;padding:0;background:#f0ede8;font-family:Georgia,serif;}' +
+    '.wrap{max-width:580px;margin:0 auto;background:#fff;}' +
+    '.top-stripe{height:4px;background:linear-gradient(to right,#0B1F3A,#C9A84C,#0B1F3A);}' +
+    '.hdr{background:#0B1F3A;padding:32px 40px 24px;}' +
+    '.hdr-mark{color:#C9A84C;font-size:9px;letter-spacing:5px;font-family:Arial,sans-serif;text-transform:uppercase;margin-bottom:12px;}' +
+    '.hdr-co{color:#fff;font-size:22px;font-family:Georgia,serif;font-style:italic;letter-spacing:1px;}' +
+    '.hero{background:#fff;padding:40px 40px 28px;border-bottom:1px solid #f0ebe0;}' +
+    '.hero-eyebrow{font-family:Arial,sans-serif;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:#C9A84C;margin-bottom:10px;}' +
+    '.hero-hed{font-size:32px;font-family:Georgia,serif;color:#0B1F3A;line-height:1.25;margin-bottom:8px;}' +
+    '.hero-sub{font-size:14px;color:#888;font-family:Arial,sans-serif;line-height:1.6;}' +
+    '.letter{padding:36px 40px;border-bottom:1px solid #f0ebe0;}' +
+    '.letter p{font-size:15px;color:#333;line-height:1.85;margin:0 0 18px;font-family:Georgia,serif;}' +
+    '.letter p.lead{font-size:17px;color:#0B1F3A;font-weight:bold;font-style:italic;}' +
+    '.divider{height:1px;background:linear-gradient(to right,transparent,#C9A84C,transparent);margin:28px 0;}' +
+    '.spec-block{background:#0B1F3A;margin:0;padding:28px 40px;}' +
+    '.spec-eyebrow{font-family:Arial,sans-serif;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:#C9A84C;margin-bottom:16px;}' +
+    '.spec-row{display:flex;justify-content:space-between;align-items:baseline;padding:9px 0;border-bottom:1px solid rgba(201,168,76,.12);}' +
+    '.spec-row:last-child{border-bottom:none;}' +
+    '.spec-lbl{font-family:Arial,sans-serif;font-size:11px;color:#8a9bb0;letter-spacing:1px;}' +
+    '.spec-val{font-family:Arial,sans-serif;font-size:13px;font-weight:700;color:#fff;text-align:right;}' +
+    '.invest-row{background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.25);border-radius:4px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;margin-top:14px;}' +
+    '.invest-lbl{font-family:Arial,sans-serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#C9A84C;}' +
+    '.invest-val{font-family:Arial,sans-serif;font-size:26px;font-weight:700;color:#C9A84C;}' +
+    '.timeline-block{padding:28px 40px;border-bottom:1px solid #f0ebe0;}' +
+    '.tl-hed{font-family:Arial,sans-serif;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:#C9A84C;margin-bottom:18px;}' +
+    '.tl-item{display:flex;gap:14px;margin-bottom:16px;align-items:flex-start;}' +
+    '.tl-num{width:26px;height:26px;border-radius:50%;background:#0B1F3A;color:#C9A84C;font-family:Arial,sans-serif;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:26px;text-align:center;}' +
+    '.tl-body{}' +
+    '.tl-day{font-family:Arial,sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#C9A84C;margin-bottom:1px;}' +
+    '.tl-title{font-family:Georgia,serif;font-size:14px;color:#0B1F3A;font-weight:bold;}' +
+    '.tl-desc{font-family:Arial,sans-serif;font-size:11px;color:#888;margin-top:2px;line-height:1.5;}' +
+    '.promise-block{background:#f8f5f0;padding:28px 40px;border-bottom:1px solid #e8e0d0;}' +
+    '.promise-hed{font-family:Arial,sans-serif;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:#C9A84C;margin-bottom:14px;}' +
+    '.promise-item{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;}' +
+    '.promise-check{color:#C9A84C;font-size:14px;flex-shrink:0;margin-top:1px;}' +
+    '.promise-txt{font-family:Arial,sans-serif;font-size:13px;color:#333;line-height:1.55;}' +
+    '.promise-txt strong{color:#0B1F3A;}' +
+    '.sig-block{padding:32px 40px;border-bottom:1px solid #f0ebe0;}' +
+    '.sig-block p{font-family:Georgia,serif;font-size:15px;color:#333;line-height:1.8;margin:0 0 14px;}' +
+    '.sig-name{font-family:Georgia,serif;font-size:18px;color:#0B1F3A;font-style:italic;margin-bottom:2px;}' +
+    '.sig-title{font-family:Arial,sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#888;}' +
+    '.sig-phone{font-family:Arial,sans-serif;font-size:13px;color:#C9A84C;font-weight:700;margin-top:6px;}' +
+    '.ftr{background:#0B1F3A;padding:20px 40px;text-align:center;}' +
+    '.ftr-co{font-family:Arial,sans-serif;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:#C9A84C;margin-bottom:4px;}' +
+    '.ftr-sub{font-family:Arial,sans-serif;font-size:10px;color:#8a9bb0;}' +
+    '</style></head><body>' +
+    '<div class="wrap">' +
+    '<div class="top-stripe"></div>' +
+    '<div class="hdr"><div class="hdr-mark">Arizona\'s Finest</div><div class="hdr-co">Certified Contracting LLC</div></div>' +
+    '<div class="hero">' +
+    '<div class="hero-eyebrow">Project Confirmed · ' + dateStr + '</div>' +
+    '<div class="hero-hed">Your home is in good hands, ' + firstName + '.</div>' +
+    '<div class="hero-sub">Here\'s everything you need to know before we show up at your door.</div>' +
     '</div>' +
-    '<div class="ftr"><div class="fc">Certified Contracting LLC</div><div class="fs">ROC #364621 · KB-2 · Arizona\'s Finest · (480) 901-0939 · certifiedcontractingaz.com</div></div>' +
+    '<div class="letter">' +
+    '<p class="lead">This isn\'t a standard confirmation email.</p>' +
+    '<p>Most contractors send you a form. We\'re sending you this because we think you deserve to know exactly what happens next, exactly who\'s responsible for it, and exactly what we promised you today — in writing.</p>' +
+    '<p>You made a smart decision. Not because you chose us — but because you chose to protect your home before the monsoon made that decision for you. That\'s the move people with good judgment make.</p>' +
+    '<p>Here\'s your complete project record. Keep it. Reference it. Share it with your spouse. And if anything ever feels off — call ' + rep.name.split(' ')[0] + ' directly.</p>' +
+    '<div class="divider"></div>' +
+    '</div>' +
+    '<div class="spec-block">' +
+    '<div class="spec-eyebrow">Your Project Details</div>' +
+    '<div class="spec-row"><span class="spec-lbl">Homeowner</span><span class="spec-val">' + (ST.hwName||'—') + '</span></div>' +
+    '<div class="spec-row"><span class="spec-lbl">Property</span><span class="spec-val">' + (ST.hwAddr||'—') + '</span></div>' +
+    '<div class="spec-row"><span class="spec-lbl">Scope of Work</span><span class="spec-val">' + scope + '</span></div>' +
+    '<div class="spec-row"><span class="spec-lbl">Roof Condition</span><span class="spec-val">' + (ST.grade ? 'Grade ' + ST.grade : '—') + '</span></div>' +
+    '<div class="spec-row"><span class="spec-lbl">Squares</span><span class="spec-val">' + (ST.squares||'—') + '</span></div>' +
+    '<div class="spec-row"><span class="spec-lbl">Payment</span><span class="spec-val">' + payLabel + '</span></div>' +
+    (ST.payment===1 ? '<div class="spec-row"><span class="spec-lbl">Monthly Estimate</span><span class="spec-val">' + moAmt + ' · 30yr · HFS Financial</span></div>' : '') +
+    '<div class="invest-row"><span class="invest-lbl">Total Investment</span><span class="invest-val">' + total + '</span></div>' +
+    '</div>' +
+    '<div class="timeline-block">' +
+    '<div class="tl-hed">What Happens Next — Day by Day</div>' +
+    '<div class="tl-item"><div class="tl-num">1</div><div class="tl-body"><div class="tl-day">Day One</div><div class="tl-title">Materials Arrive</div><div class="tl-desc">Tamko Titan XT and Veer Ultimate Ultra staged at your property. You\'ll get a photo confirmation so you know everything is there before the crew arrives.</div></div></div>' +
+    '<div class="tl-item"><div class="tl-num">2</div><div class="tl-body"><div class="tl-day">Day Two</div><div class="tl-title">The Old System Comes Off</div><div class="tl-desc">Full tear-off by our in-house crew. Every piece of old material removed and hauled. No debris left behind.</div></div></div>' +
+    '<div class="tl-item"><div class="tl-num">3</div><div class="tl-body"><div class="tl-day">Day Three</div><div class="tl-title">Your New Roof Goes On</div><div class="tl-desc">Veer Ultimate Ultra is laid. All flashings replaced. The new system is installed by the same crew you\'ve already met.</div></div></div>' +
+    '<div class="tl-item"><div class="tl-num">4</div><div class="tl-body"><div class="tl-day">Day Four</div><div class="tl-title">Quality Control Inspection</div><div class="tl-desc">Your Project Manager walks the entire job. Magnetic sweep for nails. Full photo documentation. Punch list reviewed.</div></div></div>' +
+    '<div class="tl-item"><div class="tl-num">5</div><div class="tl-body"><div class="tl-day">Day Five</div><div class="tl-title">You Walk It With Us</div><div class="tl-desc">We don\'t leave until you\'re satisfied. Warranty registered in your name. Job closed. Your roof is done.</div></div></div>' +
+    '</div>' +
+    '<div class="promise-block">' +
+    '<div class="promise-hed">What We Promised You Today</div>' +
+    '<div class="promise-item"><div class="promise-check">✓</div><div class="promise-txt"><strong>Veer Ultimate Ultra — Lifetime Manufacturer Warranty.</strong> The underlayment system under every tile. Covered for the life of the home. Transferable to the next owner if you ever sell.</div></div>' +
+    '<div class="promise-item"><div class="promise-check">✓</div><div class="promise-txt"><strong>5-Year Workmanship Guarantee.</strong> If anything we installed fails in the first five years — we come back. No argument, no fine print.</div></div>' +
+    '<div class="promise-item"><div class="promise-check">✓</div><div class="promise-txt"><strong>100% In-House Crews.</strong> The people on your roof work directly for Certified Contracting. Not a subcontractor we called the night before.</div></div>' +
+    '<div class="promise-item"><div class="promise-check">✓</div><div class="promise-txt"><strong>CompanyCam Documentation.</strong> Every phase photographed and time-stamped. You\'ll have access to every photo before, during, and after.</div></div>' +
+    '<div class="promise-item"><div class="promise-check">✓</div><div class="promise-txt"><strong>One direct contact — start to finish.</strong> Your PM\'s number is below. Not a call center. One person who knows your job.</div></div>' +
+    '</div>' +
+    '<div class="sig-block">' +
+    '<p>Your start date will be confirmed within 24 hours. If you have any questions before then — about materials, timing, the crew, anything — call or text me directly. No voicemail, no runaround.</p>' +
+    '<p>Grateful for your trust. We won\'t let you down.</p>' +
+    '<div class="sig-name">' + rep.name + '</div>' +
+    '<div class="sig-title">Your Project Rep · Certified Contracting LLC</div>' +
+    '<div class="sig-phone">' + rep.phone + '</div>' +
+    '</div>' +
+    '<div class="ftr"><div class="ftr-co">Certified Contracting LLC</div><div class="ftr-sub">ROC #364621 · KB-2 · (480) 901-0939 · certifiedcontractingaz.com · Arizona\'s Finest</div></div>' +
     '</div></body></html>';
 
   // Payload matching the GAS webhook format
