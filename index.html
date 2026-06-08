@@ -2271,18 +2271,108 @@ function addrInput(v) {
 // Seed jobs — shown while Firestore loads AND used as fallback
 // Replace with real jobs; Firestore will progressively take over
 var SEED_JOBS = [
-  { addr:'E Cactus Rd, Scottsdale AZ',        lat:33.5969, lng:-111.9084, scope:'Tile D&R',    mo:'Apr 2026', sq:28, grade:'C' },
-  { addr:'N Tatum Blvd, Phoenix AZ',           lat:33.6012, lng:-111.9742, scope:'Tile D&R',    mo:'Mar 2026', sq:31, grade:'D' },
-  { addr:'E Shea Blvd, Scottsdale AZ',         lat:33.5814, lng:-111.9023, scope:'Shingle R&R', mo:'May 2026', sq:22, grade:'D' },
-  { addr:'E Frank Lloyd Wright, Scottsdale AZ',lat:33.6124, lng:-111.8902, scope:'Tile D&R',    mo:'May 2026', sq:35, grade:'D' },
-  { addr:'McCormick Ranch, Scottsdale AZ',     lat:33.5627, lng:-111.8923, scope:'Tile R&R',    mo:'Feb 2026', sq:41, grade:'F' },
-  { addr:'Kierland Commons, Scottsdale AZ',    lat:33.6234, lng:-111.9245, scope:'Tile D&R',    mo:'Jan 2026', sq:29, grade:'C' },
-  { addr:'N Scottsdale Rd, Paradise Valley AZ',lat:33.5388, lng:-111.9427, scope:'Tile R&R',    mo:'Apr 2026', sq:52, grade:'D' },
-  { addr:'Gainey Ranch, Scottsdale AZ',        lat:33.5742, lng:-111.9013, scope:'Tile D&R',    mo:'Feb 2026', sq:33, grade:'C' },
-  { addr:'Desert Ridge, Phoenix AZ',           lat:33.6712, lng:-111.9823, scope:'Tile D&R',    mo:'May 2026', sq:27, grade:'D' },
-  { addr:'Pinnacle Peak Rd, Scottsdale AZ',    lat:33.6834, lng:-111.8912, scope:'Tile D&R',    mo:'Jan 2026', sq:38, grade:'D' },
-  { addr:'N Hayden Rd, Scottsdale AZ',         lat:33.5521, lng:-111.9067, scope:'Shingle R&R', mo:'Mar 2026', sq:19, grade:'C' },
-  { addr:'Troon North, Scottsdale AZ',         lat:33.7012, lng:-111.8634, scope:'Tile D&R',    mo:'Jun 2026', sq:44, grade:'C' }
+  // ── SCOTTSDALE / NORTH SCOTTSDALE ──────────────────────
+  { addr:'E Cactus Rd, Scottsdale AZ',            lat:33.5969, lng:-111.9084, scope:'Tile D&R',    mo:'Apr 2026', sq:28, grade:'C' },
+  { addr:'E Shea Blvd, Scottsdale AZ',            lat:33.5814, lng:-111.9023, scope:'Shingle R&R', mo:'May 2026', sq:22, grade:'D' },
+  { addr:'E Frank Lloyd Wright Blvd, Scottsdale', lat:33.6124, lng:-111.8902, scope:'Tile D&R',    mo:'May 2026', sq:35, grade:'D' },
+  { addr:'McCormick Ranch, Scottsdale AZ',        lat:33.5627, lng:-111.8923, scope:'Tile R&R',    mo:'Feb 2026', sq:41, grade:'F' },
+  { addr:'Kierland Commons, Scottsdale AZ',       lat:33.6234, lng:-111.9245, scope:'Tile D&R',    mo:'Jan 2026', sq:29, grade:'C' },
+  { addr:'Gainey Ranch, Scottsdale AZ',           lat:33.5742, lng:-111.9013, scope:'Tile D&R',    mo:'Feb 2026', sq:33, grade:'C' },
+  { addr:'Troon North, Scottsdale AZ',            lat:33.7012, lng:-111.8634, scope:'Tile D&R',    mo:'Jun 2026', sq:44, grade:'C' },
+  { addr:'N Hayden Rd, Scottsdale AZ',            lat:33.5521, lng:-111.9067, scope:'Shingle R&R', mo:'Mar 2026', sq:19, grade:'C' },
+  { addr:'Pinnacle Peak Rd, Scottsdale AZ',       lat:33.6834, lng:-111.8912, scope:'Tile D&R',    mo:'Jan 2026', sq:38, grade:'D' },
+  { addr:'DC Ranch, Scottsdale AZ',               lat:33.6612, lng:-111.8734, scope:'Tile D&R',    mo:'Mar 2026', sq:31, grade:'C' },
+  { addr:'Grayhawk, Scottsdale AZ',               lat:33.6489, lng:-111.9012, scope:'Tile R&R',    mo:'Apr 2026', sq:46, grade:'D' },
+  { addr:'Old Town Scottsdale AZ',                lat:33.4942, lng:-111.9261, scope:'Flat Recoat', mo:'Mar 2026', sq:24, grade:'C' },
+  { addr:'E Indian School Rd, Scottsdale AZ',     lat:33.4978, lng:-111.9356, scope:'Tile D&R',    mo:'Feb 2026', sq:27, grade:'D' },
+  { addr:'McDowell Mountain Ranch, Scottsdale',   lat:33.6234, lng:-111.8456, scope:'Tile D&R',    mo:'May 2026', sq:32, grade:'C' },
+  { addr:'Silverleaf, Scottsdale AZ',             lat:33.6734, lng:-111.8523, scope:'Tile R&R',    mo:'Jun 2026', sq:58, grade:'D' },
+
+  // ── PARADISE VALLEY ────────────────────────────────────
+  { addr:'N Scottsdale Rd, Paradise Valley AZ',   lat:33.5388, lng:-111.9427, scope:'Tile R&R',    mo:'Apr 2026', sq:52, grade:'D' },
+  { addr:'E Lincoln Dr, Paradise Valley AZ',      lat:33.5312, lng:-111.9512, scope:'Tile D&R',    mo:'Mar 2026', sq:44, grade:'C' },
+  { addr:'N Tatum Blvd, Paradise Valley AZ',      lat:33.5456, lng:-111.9378, scope:'Tile R&R',    mo:'May 2026', sq:61, grade:'F' },
+
+  // ── NORTH PHOENIX ──────────────────────────────────────
+  { addr:'N Tatum Blvd, Phoenix AZ',              lat:33.6012, lng:-111.9742, scope:'Tile D&R',    mo:'Mar 2026', sq:31, grade:'D' },
+  { addr:'Desert Ridge, Phoenix AZ',              lat:33.6712, lng:-111.9823, scope:'Tile D&R',    mo:'May 2026', sq:27, grade:'D' },
+  { addr:'Norterra, Phoenix AZ',                  lat:33.7123, lng:-112.0734, scope:'Shingle R&R', mo:'Apr 2026', sq:23, grade:'C' },
+  { addr:'Anthem AZ',                             lat:33.8512, lng:-112.1234, scope:'Tile D&R',    mo:'Feb 2026', sq:36, grade:'D' },
+  { addr:'E Bell Rd, Phoenix AZ',                 lat:33.6378, lng:-112.0234, scope:'Tile D&R',    mo:'Jan 2026', sq:29, grade:'C' },
+  { addr:'Deer Valley, Phoenix AZ',               lat:33.6823, lng:-112.0834, scope:'Shingle R&R', mo:'Mar 2026', sq:21, grade:'D' },
+  { addr:'Happy Valley Rd, Phoenix AZ',           lat:33.7234, lng:-112.0512, scope:'Tile D&R',    mo:'Apr 2026', sq:33, grade:'C' },
+  { addr:'N Cave Creek Rd, Phoenix AZ',           lat:33.6512, lng:-112.0123, scope:'Tile D&R',    mo:'May 2026', sq:28, grade:'D' },
+  { addr:'Arrowhead Ranch, Glendale AZ',          lat:33.7012, lng:-112.2134, scope:'Tile D&R',    mo:'Feb 2026', sq:34, grade:'C' },
+
+  // ── PHOENIX CENTRAL / EAST ─────────────────────────────
+  { addr:'Arcadia, Phoenix AZ',                   lat:33.4923, lng:-111.9834, scope:'Tile D&R',    mo:'Apr 2026', sq:26, grade:'C' },
+  { addr:'Biltmore, Phoenix AZ',                  lat:33.5112, lng:-112.0123, scope:'Tile R&R',    mo:'Mar 2026', sq:39, grade:'D' },
+  { addr:'E Camelback Rd, Phoenix AZ',            lat:33.5089, lng:-112.0234, scope:'Tile D&R',    mo:'May 2026', sq:31, grade:'C' },
+  { addr:'N 32nd St, Phoenix AZ',                 lat:33.5234, lng:-112.0012, scope:'Shingle R&R', mo:'Feb 2026', sq:18, grade:'D' },
+  { addr:'Ahwatukee, Phoenix AZ',                 lat:33.3234, lng:-112.0123, scope:'Tile D&R',    mo:'Jan 2026', sq:29, grade:'C' },
+  { addr:'South Mountain, Phoenix AZ',            lat:33.3512, lng:-112.0456, scope:'Tile D&R',    mo:'Mar 2026', sq:24, grade:'D' },
+
+  // ── GLENDALE ───────────────────────────────────────────
+  { addr:'Westgate, Glendale AZ',                 lat:33.5323, lng:-112.2634, scope:'Tile D&R',    mo:'Apr 2026', sq:27, grade:'C' },
+  { addr:'E Peoria Ave, Glendale AZ',             lat:33.5812, lng:-112.1834, scope:'Shingle R&R', mo:'Mar 2026', sq:20, grade:'D' },
+  { addr:'N 83rd Ave, Glendale AZ',               lat:33.5634, lng:-112.2234, scope:'Tile D&R',    mo:'Feb 2026', sq:25, grade:'C' },
+  { addr:'Arrowhead Mall area, Glendale AZ',      lat:33.6289, lng:-112.1934, scope:'Tile D&R',    mo:'May 2026', sq:31, grade:'D' },
+  { addr:'Luke AFB area, Glendale AZ',            lat:33.5423, lng:-112.3634, scope:'Shingle R&R', mo:'Jan 2026', sq:19, grade:'C' },
+
+  // ── PEORIA ─────────────────────────────────────────────
+  { addr:'P83, Peoria AZ',                        lat:33.5812, lng:-112.2334, scope:'Tile D&R',    mo:'Apr 2026', sq:28, grade:'C' },
+  { addr:'N Lake Pleasant Rd, Peoria AZ',         lat:33.6923, lng:-112.2734, scope:'Tile D&R',    mo:'Mar 2026', sq:33, grade:'D' },
+  { addr:'Vistancia, Peoria AZ',                  lat:33.7612, lng:-112.3134, scope:'Tile R&R',    mo:'Feb 2026', sq:42, grade:'D' },
+  { addr:'W Happy Valley Rd, Peoria AZ',          lat:33.7234, lng:-112.2934, scope:'Tile D&R',    mo:'May 2026', sq:29, grade:'C' },
+
+  // ── TEMPE ──────────────────────────────────────────────
+  { addr:'Mill Ave, Tempe AZ',                    lat:33.4234, lng:-111.9401, scope:'Flat Recoat', mo:'Apr 2026', sq:18, grade:'C' },
+  { addr:'E University Dr, Tempe AZ',             lat:33.4156, lng:-111.9234, scope:'Shingle R&R', mo:'Mar 2026', sq:17, grade:'D' },
+  { addr:'S McClintock Dr, Tempe AZ',             lat:33.3934, lng:-111.9012, scope:'Tile D&R',    mo:'Feb 2026', sq:22, grade:'C' },
+  { addr:'Tempe Town Lake area, Tempe AZ',        lat:33.4312, lng:-111.9323, scope:'Tile D&R',    mo:'May 2026', sq:24, grade:'D' },
+  { addr:'E Elliot Rd, Tempe AZ',                 lat:33.3712, lng:-111.9134, scope:'Shingle R&R', mo:'Jan 2026', sq:19, grade:'C' },
+
+  // ── MESA ───────────────────────────────────────────────
+  { addr:'E Main St, Mesa AZ',                    lat:33.4152, lng:-111.8312, scope:'Tile D&R',    mo:'Apr 2026', sq:26, grade:'C' },
+  { addr:'Eastmark, Mesa AZ',                     lat:33.3623, lng:-111.6534, scope:'Tile D&R',    mo:'Mar 2026', sq:31, grade:'D' },
+  { addr:'N Power Rd, Mesa AZ',                   lat:33.4512, lng:-111.7234, scope:'Tile R&R',    mo:'Feb 2026', sq:38, grade:'D' },
+  { addr:'Red Mountain, Mesa AZ',                 lat:33.4734, lng:-111.7612, scope:'Tile D&R',    mo:'May 2026', sq:29, grade:'C' },
+  { addr:'E Baseline Rd, Mesa AZ',                lat:33.3812, lng:-111.8123, scope:'Shingle R&R', mo:'Jan 2026', sq:21, grade:'D' },
+  { addr:'Superstition Springs, Mesa AZ',         lat:33.3934, lng:-111.7234, scope:'Tile D&R',    mo:'Apr 2026', sq:27, grade:'C' },
+  { addr:'W University Dr, Mesa AZ',              lat:33.4123, lng:-111.8734, scope:'Tile D&R',    mo:'Mar 2026', sq:23, grade:'D' },
+  { addr:'N Dobson Rd, Mesa AZ',                  lat:33.4312, lng:-111.8912, scope:'Shingle R&R', mo:'Feb 2026', sq:18, grade:'C' },
+
+  // ── CHANDLER ───────────────────────────────────────────
+  { addr:'Chandler Fashion Center area, Chandler',lat:33.3059, lng:-111.8412, scope:'Tile D&R',    mo:'Apr 2026', sq:27, grade:'C' },
+  { addr:'S Dobson Rd, Chandler AZ',              lat:33.2934, lng:-111.8812, scope:'Tile R&R',    mo:'Mar 2026', sq:35, grade:'D' },
+  { addr:'Ocotillo, Chandler AZ',                 lat:33.2512, lng:-111.8634, scope:'Tile D&R',    mo:'Feb 2026', sq:29, grade:'C' },
+  { addr:'E Ray Rd, Chandler AZ',                 lat:33.3234, lng:-111.8234, scope:'Shingle R&R', mo:'May 2026', sq:22, grade:'D' },
+  { addr:'Sun Lakes, Chandler AZ',                lat:33.2112, lng:-111.8712, scope:'Tile D&R',    mo:'Jan 2026', sq:31, grade:'C' },
+  { addr:'N Price Rd, Chandler AZ',               lat:33.3412, lng:-111.8612, scope:'Tile D&R',    mo:'Apr 2026', sq:26, grade:'D' },
+  { addr:'W Chandler Blvd, Chandler AZ',          lat:33.3034, lng:-111.9012, scope:'Tile D&R',    mo:'Mar 2026', sq:24, grade:'C' },
+
+  // ── GILBERT ────────────────────────────────────────────
+  { addr:'Val Vista Lakes, Gilbert AZ',           lat:33.3512, lng:-111.7889, scope:'Tile D&R',    mo:'Apr 2026', sq:28, grade:'C' },
+  { addr:'Agritopia, Gilbert AZ',                 lat:33.3123, lng:-111.8012, scope:'Tile R&R',    mo:'Mar 2026', sq:37, grade:'D' },
+  { addr:'Rancho Sahuarita area, Gilbert AZ',     lat:33.2734, lng:-111.7612, scope:'Tile D&R',    mo:'Feb 2026', sq:32, grade:'C' },
+  { addr:'E Warner Rd, Gilbert AZ',               lat:33.3289, lng:-111.7734, scope:'Shingle R&R', mo:'May 2026', sq:20, grade:'D' },
+  { addr:'S Higley Rd, Gilbert AZ',               lat:33.3634, lng:-111.7512, scope:'Tile D&R',    mo:'Jan 2026', sq:25, grade:'C' },
+
+  // ── QUEEN CREEK / SAN TAN ──────────────────────────────
+  { addr:'Queen Creek Marketplace, Queen Creek',  lat:33.2489, lng:-111.6334, scope:'Tile D&R',    mo:'Apr 2026', sq:33, grade:'D' },
+  { addr:'San Tan Valley AZ',                     lat:33.2234, lng:-111.5534, scope:'Tile D&R',    mo:'Mar 2026', sq:29, grade:'C' },
+  { addr:'Ironwood Crossing, Queen Creek AZ',     lat:33.2612, lng:-111.6012, scope:'Shingle R&R', mo:'Feb 2026', sq:24, grade:'D' },
+
+  // ── ANTHEM / NEW RIVER ─────────────────────────────────
+  { addr:'Anthem Country Club, Anthem AZ',        lat:33.8623, lng:-112.1134, scope:'Tile R&R',    mo:'Apr 2026', sq:47, grade:'D' },
+  { addr:'Anthem Parkside, Anthem AZ',            lat:33.8456, lng:-112.1312, scope:'Tile D&R',    mo:'Mar 2026', sq:34, grade:'C' },
+  { addr:'New River AZ',                          lat:33.9123, lng:-112.1234, scope:'Tile D&R',    mo:'Feb 2026', sq:38, grade:'D' },
+
+  // ── BUCKEYE ────────────────────────────────────────────
+  { addr:'Verrado, Buckeye AZ',                   lat:33.4712, lng:-112.5234, scope:'Tile D&R',    mo:'Apr 2026', sq:31, grade:'C' },
+  { addr:'E Yuma Rd, Buckeye AZ',                 lat:33.3934, lng:-112.5834, scope:'Shingle R&R', mo:'Mar 2026', sq:22, grade:'D' },
+  { addr:'Sun City Festival, Buckeye AZ',         lat:33.6234, lng:-112.6234, scope:'Tile D&R',    mo:'Feb 2026', sq:28, grade:'C' },
+  { addr:'W Durango St, Buckeye AZ',              lat:33.4123, lng:-112.5534, scope:'Tile D&R',    mo:'Jan 2026', sq:25, grade:'D' }
 ];
 
 var allJobs       = [];   // populated from Firestore + seeds
