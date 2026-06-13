@@ -1,20 +1,757 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CCU Recruiting Co-Pilot</title>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#060D1A;}</style>
-</head>
-<body>
-<div id="root"></div>
-<script type="text/babel" src="recruiting.jsx"></script>
-<script type="text/babel">
-  const root = ReactDOM.createRoot(document.getElementById('root'));
-  root.render(React.createElement(App));
-</script>
-</body>
-</html>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>CCU Recruiting Co-Pilot</title><script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script><script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script><script src="https://unpkg.com/@babel/standalone/babel.min.js"></script><style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#060D1A;}</style></head><body><div id="root"></div><script type="text/babel">/**
+ * CCU RECRUITING CO-PILOT — LIVE VERSION
+ * Connected to real Firebase backend via REST API
+ * Set BACKEND_URL to your deployed server URL
+ */
+
+
+// ── CONFIG — change this to your deployed backend URL ──────────────────────
+const BACKEND_URL = "https://ccu-backend-production.up.railway.app";
+// After deploying to Railway/Render, replace the URL above.
+// For local dev: "http://localhost:3001"
+
+// ─── BRAND ────────────────────────────────────────────────────────────────────
+const C = {
+  navy:"#0B1F3A", navyMid:"#0F2850", gold:"#C9A84C", dark:"#060D1A",
+  surface:"#0D2040", surf2:"#112448", surf3:"#162A52",
+  text:"#EEE9E0", muted:"#7A9BBF",
+  green:"#10B981", red:"#E05252", amber:"#F59E0B", purple:"#8B5CF6", blue:"#3B82F6",
+};
+
+const MARKETS = {
+  "Phoenix Core":              { color:C.blue,    target:600 },
+  "Scottsdale":                { color:C.gold,    target:200 },
+  "Mesa / Gilbert / Chandler": { color:C.green,   target:300 },
+  "Glendale / Peoria":         { color:C.amber,   target:200 },
+  "Tempe / Ahwatukee":         { color:C.purple,  target:150 },
+  "East Valley":               { color:"#EC4899", target:150 },
+  "Tucson":                    { color:"#14B8A6", target:200 },
+  "Flagstaff / N. AZ":         { color:"#6366F1", target:100 },
+  "Prescott / Yavapai":        { color:"#F97316", target:100 },
+};
+
+const STAGES = ["Applied","Screened","Interview","Offer","Hired","No Show"];
+const SC = { Applied:C.blue, Screened:C.purple, Interview:C.amber, Offer:C.gold, Hired:C.green, "No Show":"#6B7280" };
+const TIER_COLORS = { HOT:C.red, WARM:C.amber, NURTURE:C.purple, REJECT:"#6B7280", PENDING:C.muted };
+
+const TABS = [
+  {id:"copilot",  label:"Co-Pilot",  icon:"🤖"},
+  {id:"pipeline", label:"Pipeline",  icon:"📊"},
+  {id:"markets",  label:"Markets",   icon:"🗺️"},
+  {id:"content",  label:"Content",   icon:"✍️"},
+  {id:"sprint",   label:"Sprint",    icon:"🏃"},
+  {id:"followup", label:"Follow-Up", icon:"💬"},
+  {id:"reports",  label:"Reports",   icon:"📈"},
+];
+
+const CONTENT_TYPES = {
+  jobpost:   {label:"Job Post",           icon:"📢"},
+  tiktok:    {label:"TikTok Script",      icon:"🎬"},
+  sms:       {label:"SMS Sequence",       icon:"💬"},
+  email:     {label:"Email Sequence",     icon:"✉️"},
+  sprint:    {label:"Sprint Script",      icon:"🏃"},
+  objection: {label:"Objection Handlers", icon:"🛡️"},
+};
+
+// ─── API helpers ──────────────────────────────────────────────────────────────
+const api = {
+  get:   (path) => fetch(`${BACKEND_URL}${path}`).then(r=>r.json()),
+  patch: (path,body) => fetch(`${BACKEND_URL}${path}`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}).then(r=>r.json()),
+  post:  (path,body) => fetch(`${BACKEND_URL}${path}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}).then(r=>r.json()),
+};
+
+async function callAI(prompt, system="", maxTokens=1000) {
+  const res = await fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      model:"claude-sonnet-4-6", max_tokens:maxTokens,
+      ...(system ? {system} : {}),
+      messages:[{role:"user",content:prompt}],
+    }),
+  });
+  const d = await res.json();
+  return d.content?.find(b=>b.type==="text")?.text || "Error — try again.";
+}
+
+const pct = (n,d) => d ? Math.round(n/d*100) : 0;
+const fmtTime = s => `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+const fmtDate = ts => ts ? new Date(ts).toLocaleDateString("en-US",{month:"short",day:"numeric"}) : "—";
+
+// ─── MAIN APP ─────────────────────────────────────────────────────────────────
+function App() {
+  const [tab, setTab]               = useState("copilot");
+  const [applicants, setApplicants] = useState([]);
+  const [stats, setStats]           = useState({total:0,screened:0,interviewed:0,hired:0,noShows:0,hot:0,byMarket:{},bySource:{},byStage:{}});
+  const [loading, setLoading]       = useState(true);
+  const [connected, setConnected]   = useState(false);
+  const [lastRefresh, setLastRefresh] = useState(null);
+
+  const [selectedApp, setSelectedApp]   = useState(null);
+  const [filterStage, setFilterStage]   = useState("All");
+  const [filterMarket, setFilterMarket] = useState("All");
+
+  const [plan, setPlan]         = useState(null);
+  const [planLoading, setPlanLoading] = useState(false);
+  const [chat, setChat]         = useState([]);
+  const [chatInput, setChatInput] = useState("");
+  const [chatLoading, setChatLoading] = useState(false);
+  const chatRef = useRef(null);
+
+  const [contentType, setContentType]       = useState("jobpost");
+  const [contentMarket, setContentMarket]   = useState("Phoenix Core");
+  const [contentPlatform, setContentPlatform] = useState("facebook");
+  const [generated, setGenerated]           = useState("");
+  const [generating, setGenerating]         = useState(false);
+  const [copied, setCopied]                 = useState(false);
+
+  const [sprintActive, setSprintActive] = useState(false);
+  const [sprintStep, setSprintStep]     = useState(0);
+  const [sprintSecs, setSprintSecs]     = useState(600);
+  const sprintRef = useRef(null);
+
+  const [reportText, setReportText]     = useState("");
+  const [reportLoading, setReportLoading] = useState(false);
+
+  const [addForm, setAddForm]   = useState(false);
+  const [newApp, setNewApp]     = useState({name:"",phone:"",market:"Phoenix Core",source:"Manual Entry"});
+
+  // ── Data loading ─────────────────────────────────────────────────────────
+  const loadData = useCallback(async () => {
+    try {
+      const [appsRes, statsRes] = await Promise.all([
+        api.get("/api/applicants"),
+        api.get("/api/stats"),
+      ]);
+      setApplicants(appsRes.applicants || []);
+      setStats(statsRes);
+      setConnected(true);
+      setLastRefresh(new Date());
+    } catch {
+      setConnected(false);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { loadData(); }, [loadData]);
+
+  // Auto-refresh every 30 seconds
+  useEffect(() => {
+    const t = setInterval(loadData, 30000);
+    return () => clearInterval(t);
+  }, [loadData]);
+
+  // ── Sprint timer ──────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (sprintActive && sprintSecs > 0) {
+      sprintRef.current = setTimeout(() => setSprintSecs(s=>s-1), 1000);
+    } else if (sprintSecs === 0) setSprintActive(false);
+    return () => clearTimeout(sprintRef.current);
+  }, [sprintActive, sprintSecs]);
+
+  // ── Chat scroll ───────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight;
+  }, [chat]);
+
+  // ── Pipeline filters ──────────────────────────────────────────────────────
+  const filtered = applicants.filter(a => {
+    if (filterStage !== "All" && a.stage !== filterStage) return false;
+    if (filterMarket !== "All" && a.market !== filterMarket) return false;
+    return true;
+  });
+
+  const marketData = Object.entries(MARKETS).map(([m,info]) => ({
+    market: m, ...info,
+    count:  stats.byMarket?.[m] || 0,
+    hired:  applicants.filter(a=>a.market===m&&a.stage==="Hired").length,
+    pctTarget: pct(stats.byMarket?.[m]||0, info.target),
+  }));
+
+  const thinMarkets = marketData.filter(m=>m.pctTarget<30);
+  const hotApps     = applicants.filter(a=>a.tier==="HOT"&&a.stage==="Applied");
+
+  // ── Stage move ────────────────────────────────────────────────────────────
+  async function moveStage(id, stage) {
+    await api.patch(`/api/applicants/${id}`, {stage});
+    setApplicants(prev=>prev.map(a=>a.id===id?{...a,stage}:a));
+    setSelectedApp(prev=>prev?.id===id?{...prev,stage}:prev);
+    loadData();
+  }
+
+  // ── Manual add ────────────────────────────────────────────────────────────
+  async function addApplicant() {
+    if (!newApp.name || !newApp.phone) return;
+    await api.post("/api/applicants", newApp);
+    setNewApp({name:"",phone:"",market:"Phoenix Core",source:"Manual Entry"});
+    setAddForm(false);
+    loadData();
+  }
+
+  // ── Co-Pilot plan ─────────────────────────────────────────────────────────
+  async function generatePlan() {
+    setPlanLoading(true); setPlan(null);
+    const thin = thinMarkets.map(m=>m.market).join(", ") || "none";
+    const text = await callAI(
+      `You are the recruiting co-pilot for Certified Contracting LLC, Arizona's Finest roofing company. Analyze this LIVE pipeline data and give Xavier a direct weekly action plan.
+
+LIVE DATA:
+- Total applicants: ${stats.total} (target: 2000/month)
+- Screened: ${stats.screened} | Interviewed: ${stats.interviewed} | Hired: ${stats.hired} | No Shows: ${stats.noShows}
+- HOT applicants awaiting call: ${stats.hot}
+- Screen rate: ${pct(stats.screened,stats.total)}% | Hire rate: ${pct(stats.hired,stats.interviewed)}%
+- Thin markets (under 30% target): ${thin}
+- Top source: ${Object.entries(stats.bySource||{}).sort((a,b)=>b[1]-a[1])[0]?.[0] || "unknown"}
+
+Format exactly:
+PIPELINE HEALTH: [one sentence]
+
+THIS WEEK (numbered, max 6, specific):
+1.
+2.
+3.
+4.
+5.
+6.
+
+AD SPEND: [exact $ and platforms]
+BIGGEST RISK: [one sentence]
+CALL NOW: [any HOT applicants to call immediately — names if available]`,
+    "", 700);
+    setPlan(text);
+    setPlanLoading(false);
+  }
+
+  // ── Chat ──────────────────────────────────────────────────────────────────
+  async function sendChat() {
+    if (!chatInput.trim() || chatLoading) return;
+    const msg = chatInput.trim();
+    setChatInput("");
+    setChatLoading(true);
+    setChat(prev=>[...prev,{role:"user",text:msg}]);
+    const history = chat.slice(-8).map(m=>({role:m.role==="user"?"user":"assistant",content:m.text}));
+    const res = await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-6", max_tokens:500,
+        system:`You are the recruiting co-pilot for Certified Contracting LLC (Arizona's Finest roofing). Xavier Medina is the founder. LIVE pipeline: ${stats.total} applicants, ${stats.hired} hired, ${stats.hot} HOT leads. Thin markets: ${thinMarkets.map(m=>m.market).join(",")||"none"}. Be direct, specific, no fluff.`,
+        messages:[...history,{role:"user",content:msg}],
+      }),
+    });
+    const d = await res.json();
+    setChat(prev=>[...prev,{role:"ai",text:d.content?.[0]?.text||"Error"}]);
+    setChatLoading(false);
+  }
+
+  // ── Content gen ───────────────────────────────────────────────────────────
+  async function generateContent() {
+    setGenerating(true); setGenerated("");
+    const prompts = {
+      jobpost:`Write a Facebook job post for a 1099 D2D roofing sales rep in ${contentMarket}, Arizona. Arizona's Finest roofing company. $800-$2,500/deal, $10K-$20K/month top reps. No experience needed. Apply: certifiedcontractingaz.com/apply. Never open with company name. No competitors. Strong CTA. Output ONLY the post.`,
+      tiktok:`Write a TikTok script recruiting D2D roofing sales reps in ${contentMarket} AZ. Format: [HOOK 3 sec], [BODY 30-45 sec], [CTA 5 sec]. Income: $10K-$20K/month. No experience needed. Raw and authentic. Xavier is on camera. Output ONLY the script.`,
+      sms:`Write a 4-touch SMS recruiting sequence for ${contentMarket} AZ roofing sales applicants. Touch 1 (0-5 min), Touch 2 (2hr no response), Touch 3 (Day 3), Touch 4 (Day 7). Under 160 chars each. No company name in openers. STOP opt-out on Touch 2+. Output ONLY the 4 texts.`,
+      email:`Write a 3-email recruiting sequence for ${contentMarket} AZ D2D roofing applicants. Email 1: immediate follow-up. Email 2: Day 3 experience objection. Email 3: Day 7 last chance. Sign as Xavier, Certified Contracting LLC, Arizona's Finest, (480) 901-0939. Output ONLY the 3 emails.`,
+      sprint:`Write a sprint recruiting game script for Xavier to run with his AZ roofing sales team. Step 1: 25-name sprint ($100 cash). Step 2: group text blast ($100 cash). Step 3: show-up bonus ($200). Include exact words Xavier says and the group text script. Output ONLY the script.`,
+      objection:`Write 5 objection handler scripts for D2D roofing sales recruiting in AZ. Cover: "Is this a pyramid scheme?", "I don't have experience", "Commission only is risky", "I already have a job", "How much can I really make?". Real numbers: $800-$2,500/deal, $10K-$20K/month top reps. Output ONLY the handlers.`,
+    };
+    const text = await callAI(prompts[contentType]||prompts.jobpost, "", 1000);
+    setGenerated(text);
+    setGenerating(false);
+  }
+
+  // ── Weekly report ─────────────────────────────────────────────────────────
+  async function generateReport() {
+    setReportLoading(true); setReportText("");
+    const byMarket = Object.entries(stats.byMarket||{}).map(([m,n])=>`${m}:${n}`).join("|");
+    const text = await callAI(
+      `Generate a weekly recruiting report for Certified Contracting LLC (Arizona's Finest). Direct executive summary Xavier reads Monday morning.
+
+LIVE DATA: Total:${stats.total}/2000 target | Screened:${stats.screened} | Interviewed:${stats.interviewed} | Hired:${stats.hired} | No Shows:${stats.noShows} | HOT leads:${stats.hot}
+By market: ${byMarket}
+
+Format: WEEK IN REVIEW | NUMBERS THAT MATTER | WHAT'S WORKING | WHAT'S BROKEN | THIS WEEK'S SINGLE PRIORITY | MARKET SPOTLIGHT
+Be direct. Under 2 min read.`,
+    "", 600);
+    setReportText(text);
+    setReportLoading(false);
+  }
+
+  // ── Styles ─────────────────────────────────────────────────────────────────
+  const S = {
+    app: {minHeight:"100vh",background:C.dark,color:C.text,fontFamily:"'Inter',system-ui,sans-serif",fontSize:14},
+    header: {background:C.navy,borderBottom:`2px solid ${C.gold}`,padding:"12px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"},
+    nav: {background:C.navy,borderBottom:`1px solid ${C.surf3}`,display:"flex",overflowX:"auto"},
+    page: {padding:"20px",maxWidth:1140,margin:"0 auto"},
+    card: (extra={}) => ({background:C.surface,borderRadius:12,padding:"18px",...extra}),
+    cardB: (color,extra={}) => ({background:C.surface,borderRadius:12,padding:"18px",border:`1px solid ${color}33`,...extra}),
+    label: {fontSize:10,color:C.muted,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:6},
+    btn: (bg=C.gold,extra={}) => ({padding:"9px 18px",borderRadius:8,border:"none",background:bg,color:bg===C.gold?C.navy:C.text,fontWeight:700,fontSize:13,cursor:"pointer",...extra}),
+    btnO: (color=C.gold,extra={}) => ({padding:"8px 16px",borderRadius:8,border:`1px solid ${color}`,background:"none",color,fontWeight:700,fontSize:13,cursor:"pointer",...extra}),
+    input: {width:"100%",padding:"9px 14px",borderRadius:8,border:`1px solid ${C.surf3}`,background:C.surf2,color:C.text,fontSize:13,outline:"none",boxSizing:"border-box"},
+    pill: (color) => ({padding:"2px 8px",borderRadius:10,fontSize:11,fontWeight:700,background:`${color}22`,color}),
+    grid: (cols,extra={}) => ({display:"grid",gridTemplateColumns:cols,gap:14,...extra}),
+    bar: (val,color,h=5) => (
+      <div style={{height:h,background:C.surf3,borderRadius:h,overflow:"hidden"}}>
+        <div style={{height:"100%",width:`${Math.min(val,100)}%`,background:color,borderRadius:h,transition:"width 0.4s"}}/>
+      </div>
+    ),
+  };
+
+  const Chip = ({label,active,color,onClick}) => (
+    <button onClick={onClick} style={{padding:"4px 11px",borderRadius:20,border:`1px solid ${active?color:C.surf3}`,background:active?`${color}22`:"none",color:active?color:C.muted,cursor:"pointer",fontSize:11,fontWeight:active?700:400}}>
+      {label}
+    </button>
+  );
+
+  const StatCard = ({label,val,color,sub}) => (
+    <div style={{...S.card(),borderLeft:`4px solid ${color}`}}>
+      <div style={S.label}>{label}</div>
+      <div style={{fontSize:36,fontWeight:900,color,lineHeight:1}}>{val}</div>
+      {sub && <div style={{fontSize:11,color:C.muted,marginTop:3}}>{sub}</div>}
+    </div>
+  );
+
+  // ── Connection banner ────────────────────────────────────────────────────
+  const ConnBanner = () => (
+    !connected && !loading ? (
+      <div style={{background:`${C.amber}22`,border:`1px solid ${C.amber}`,borderRadius:8,padding:"10px 16px",marginBottom:16,fontSize:13,color:C.amber,display:"flex",alignItems:"center",gap:10}}>
+        <span>⚠️</span>
+        <span>Backend not connected. Set <strong>BACKEND_URL</strong> to your deployed server. Showing cached data.</span>
+      </div>
+    ) : null
+  );
+
+  if (loading) return (
+    <div style={{...S.app,display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:16}}>
+      <div style={{fontSize:48}}>🤖</div>
+      <div style={{fontSize:20,fontWeight:800,color:C.gold}}>CCU Co-Pilot</div>
+      <div style={{fontSize:13,color:C.muted}}>Connecting to live pipeline...</div>
+    </div>
+  );
+
+  return (
+    <div style={S.app}>
+      {/* HEADER */}
+      <div style={S.header}>
+        <div style={{display:"flex",alignItems:"center",gap:10}}>
+          <div style={{width:36,height:36,background:C.gold,borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,color:C.navy,fontSize:18,flexShrink:0}}>C</div>
+          <div>
+            <div style={{fontWeight:800,fontSize:14,letterSpacing:"0.02em"}}>CERTIFIED CONTRACTING</div>
+            <div style={{fontSize:10,color:C.gold,letterSpacing:"0.12em",textTransform:"uppercase"}}>Recruiting Co-Pilot · Live</div>
+          </div>
+        </div>
+        <div style={{display:"flex",gap:16,alignItems:"center",flexWrap:"wrap"}}>
+          {[{l:"Pipeline",v:stats.total,c:C.gold},{l:"HOT Leads",v:stats.hot,c:C.red},{l:"Hired",v:stats.hired,c:C.green},{l:"No Shows",v:stats.noShows,c:C.muted}].map(({l,v,c})=>(
+            <div key={l} style={{textAlign:"right"}}>
+              <div style={{fontSize:10,color:C.muted,textTransform:"uppercase",letterSpacing:"0.08em"}}>{l}</div>
+              <div style={{fontSize:18,fontWeight:900,color:c}}>{v}</div>
+            </div>
+          ))}
+          <div style={{...S.pill(connected?C.green:C.amber),fontSize:11,padding:"4px 10px"}}>
+            {connected ? `● Live · ${lastRefresh?.toLocaleTimeString([]  ,{hour:"2-digit",minute:"2-digit"})}` : "● Offline"}
+          </div>
+        </div>
+      </div>
+
+      {/* NAV */}
+      <div style={S.nav}>
+        {TABS.map(t=>(
+          <button key={t.id} onClick={()=>setTab(t.id)} style={{padding:"11px 18px",background:"none",border:"none",cursor:"pointer",color:tab===t.id?C.gold:C.muted,fontWeight:tab===t.id?700:400,fontSize:12,borderBottom:tab===t.id?`2px solid ${C.gold}`:"2px solid transparent",whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:5}}>
+            <span>{t.icon}</span>{t.label}
+          </button>
+        ))}
+      </div>
+
+      <div style={S.page}>
+        <ConnBanner/>
+
+        {/* HOT LEADS ALERT */}
+        {hotApps.length > 0 && (
+          <div style={{background:`${C.red}18`,border:`1px solid ${C.red}44`,borderRadius:10,padding:"12px 18px",marginBottom:16,display:"flex",alignItems:"center",gap:12}}>
+            <span style={{fontSize:20}}>🔥</span>
+            <div style={{flex:1}}>
+              <div style={{fontWeight:700,color:C.red,fontSize:13}}>HOT LEADS — CALL NOW</div>
+              <div style={{fontSize:12,color:C.muted}}>{hotApps.map(a=>a.name).join(", ")} scored 9–10. Every hour you wait, conversion drops.</div>
+            </div>
+            <button onClick={()=>{setFilterStage("Applied");setTab("pipeline");}} style={S.btn(C.red,{fontSize:12})}>View →</button>
+          </div>
+        )}
+
+        {/* ══ CO-PILOT ══ */}
+        {tab==="copilot" && (
+          <div style={S.grid("1fr 1fr")}>
+            <div style={{display:"flex",flexDirection:"column",gap:14}}>
+              <div>
+                <div style={{fontSize:20,fontWeight:800,marginBottom:4}}>🤖 Weekly Action Plan</div>
+                <div style={{fontSize:13,color:C.muted,marginBottom:14}}>Reads your live pipeline and tells you exactly what to do this week.</div>
+              </div>
+              <div style={S.grid("repeat(2,1fr)",{gap:10})}>
+                {[{l:"Monthly Progress",v:`${pct(stats.total,2000)}%`,c:C.gold,sub:`${stats.total} of 2,000`},{l:"Screen Rate",v:`${pct(stats.screened,stats.total)}%`,c:C.purple,sub:`${stats.screened} screened`},{l:"Hire Rate",v:`${pct(stats.hired,stats.interviewed)}%`,c:C.green,sub:`${stats.hired} hired`},{l:"No Show Rate",v:`${pct(stats.noShows,stats.total)}%`,c:stats.noShows/Math.max(stats.total,1)>0.15?C.red:C.amber,sub:`${stats.noShows} ghosted`}].map(({l,v,c,sub})=>(
+                  <div key={l} style={S.cardB(c,{padding:"12px 14px"})}>
+                    <div style={S.label}>{l}</div>
+                    <div style={{fontSize:26,fontWeight:900,color:c,lineHeight:1,marginBottom:2}}>{v}</div>
+                    <div style={{fontSize:11,color:C.muted}}>{sub}</div>
+                  </div>
+                ))}
+              </div>
+              <div style={S.card()}>
+                <div style={{fontWeight:700,color:C.gold,marginBottom:12,fontSize:12}}>📍 Market Health</div>
+                {marketData.map(m=>(
+                  <div key={m.market} style={{marginBottom:10}}>
+                    <div style={{display:"flex",justifyContent:"space-between",marginBottom:3,fontSize:12}}>
+                      <span style={{color:m.pctTarget<30?C.red:m.pctTarget>70?C.green:C.text}}>{m.market}</span>
+                      <span style={{fontWeight:700,color:m.pctTarget<30?C.red:m.pctTarget>70?C.green:C.amber}}>{m.count}/{m.target}</span>
+                    </div>
+                    {S.bar(m.pctTarget, m.pctTarget<30?C.red:m.pctTarget>70?C.green:C.amber)}
+                  </div>
+                ))}
+              </div>
+              <button onClick={generatePlan} disabled={planLoading} style={S.btn(planLoading?C.surf2:C.gold,{padding:"13px",fontSize:14,borderRadius:10,opacity:planLoading?0.7:1})}>
+                {planLoading?"⚡ Analyzing live data...":"⚡ Generate This Week's Plan"}
+              </button>
+              {plan && (
+                <div style={S.cardB(C.gold,{background:C.surf2})}>
+                  <div style={{fontWeight:700,color:C.gold,marginBottom:10,fontSize:12}}>📋 ACTION PLAN</div>
+                  <pre style={{margin:0,whiteSpace:"pre-wrap",fontFamily:"inherit",fontSize:13,lineHeight:1.75}}>{plan}</pre>
+                </div>
+              )}
+            </div>
+            <div style={{display:"flex",flexDirection:"column"}}>
+              <div style={{fontSize:20,fontWeight:800,marginBottom:4}}>💬 Ask the Co-Pilot</div>
+              <div style={{fontSize:13,color:C.muted,marginBottom:14}}>Reads your live data. Ask anything.</div>
+              <div style={{...S.card(),display:"flex",flexDirection:"column",flex:1,padding:0,overflow:"hidden",minHeight:520}}>
+                <div ref={chatRef} style={{flex:1,overflowY:"auto",padding:"14px",display:"flex",flexDirection:"column",gap:10}}>
+                  {chat.length===0&&(
+                    <div style={{color:C.muted,fontSize:13,textAlign:"center",marginTop:40}}>
+                      <div style={{fontSize:32,marginBottom:10}}>🤖</div>
+                      <div style={{fontWeight:700,marginBottom:4,color:C.text}}>Co-Pilot is live.</div>
+                      <div>Reads your real pipeline. Ask anything.</div>
+                    </div>
+                  )}
+                  {chat.map((m,i)=>(
+                    <div key={i} style={{display:"flex",justifyContent:m.role==="user"?"flex-end":"flex-start"}}>
+                      <div style={{maxWidth:"82%",padding:"9px 13px",borderRadius:m.role==="user"?"12px 12px 2px 12px":"12px 12px 12px 2px",background:m.role==="user"?C.gold:C.surf3,color:m.role==="user"?C.navy:C.text,fontSize:13,lineHeight:1.65,whiteSpace:"pre-wrap"}}>{m.text}</div>
+                    </div>
+                  ))}
+                  {chatLoading&&<div style={{display:"flex",gap:5,padding:"9px 13px",background:C.surf3,borderRadius:"12px 12px 12px 2px",width:"fit-content"}}>
+                    {[0,1,2].map(i=><div key={i} style={{width:6,height:6,borderRadius:"50%",background:C.muted,animation:`bounce 1s ${i*0.15}s infinite`}}/>)}
+                  </div>}
+                </div>
+                <div style={{padding:"10px 14px",borderTop:`1px solid ${C.surf3}`,display:"flex",gap:8}}>
+                  <input value={chatInput} onChange={e=>setChatInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&sendChat()} placeholder="Which market should I push this week?" style={{...S.input,margin:0}}/>
+                  <button onClick={sendChat} disabled={chatLoading||!chatInput.trim()} style={S.btn(C.gold,{padding:"9px 16px",flexShrink:0})}>Send</button>
+                </div>
+              </div>
+              <div style={{marginTop:8,display:"flex",flexWrap:"wrap",gap:6}}>
+                {["Which market needs ads now?","How do I fix my no-show rate?","Write a Scottsdale Facebook post","Should I run sprint this week?"].map(q=>(
+                  <button key={q} onClick={()=>setChatInput(q)} style={S.btnO(C.muted,{fontSize:11,padding:"4px 10px",borderRadius:20})}>{q}</button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ══ PIPELINE ══ */}
+        {tab==="pipeline" && (
+          <div>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18,flexWrap:"wrap",gap:10}}>
+              <div>
+                <div style={{fontSize:20,fontWeight:800,marginBottom:2}}>Live Pipeline</div>
+                <div style={{fontSize:13,color:C.muted}}>Real applicants from your Firebase database. Refreshes every 30 seconds.</div>
+              </div>
+              <div style={{display:"flex",gap:8}}>
+                <button onClick={loadData} style={S.btnO(C.muted,{fontSize:12})}>↻ Refresh</button>
+                <button onClick={()=>setAddForm(true)} style={S.btn(C.gold,{fontSize:12})}>+ Add Rep</button>
+              </div>
+            </div>
+
+            {addForm && (
+              <div style={S.cardB(C.gold,{marginBottom:16})}>
+                <div style={{fontWeight:700,marginBottom:12}}>Add Rep Manually</div>
+                <div style={S.grid("1fr 1fr 1fr 1fr",{gap:10,marginBottom:12})}>
+                  {[["Name","name","text"],["Phone","phone","tel"],["Market","market","text"],["Source","source","text"]].map(([l,k,t])=>(
+                    <div key={k}>
+                      <div style={S.label}>{l}</div>
+                      <input type={t} value={newApp[k]} onChange={e=>setNewApp(p=>({...p,[k]:e.target.value}))} style={S.input}/>
+                    </div>
+                  ))}
+                </div>
+                <div style={{display:"flex",gap:8}}>
+                  <button onClick={addApplicant} style={S.btn(C.gold)}>Add to Pipeline</button>
+                  <button onClick={()=>setAddForm(false)} style={S.btnO(C.muted)}>Cancel</button>
+                </div>
+              </div>
+            )}
+
+            <div style={S.grid("repeat(4,1fr)",{marginBottom:18})}>
+              <StatCard label="Applied"     val={stats.total}       color={C.blue}   sub={`${pct(stats.total,2000)}% of 2,000 goal`}/>
+              <StatCard label="Screened"    val={stats.screened}    color={C.purple} sub={`${pct(stats.screened,stats.total)}% screen rate`}/>
+              <StatCard label="Interviewed" val={stats.interviewed} color={C.amber}  sub={`${pct(stats.interviewed,stats.screened)}% of screened`}/>
+              <StatCard label="Hired"       val={stats.hired}       color={C.green}  sub={`${pct(stats.hired,stats.interviewed)}% close rate`}/>
+            </div>
+
+            <div style={{display:"flex",gap:7,marginBottom:14,flexWrap:"wrap"}}>
+              {["All",...STAGES].map(s=><Chip key={s} label={s} active={filterStage===s} color={SC[s]||C.gold} onClick={()=>setFilterStage(s)}/>)}
+              <div style={{width:1,height:18,background:C.surf3,margin:"0 4px"}}/>
+              {["All",...Object.keys(MARKETS).slice(0,5)].map(m=><Chip key={m} label={m==="All"?"All":m.split("/")[0].trim()} active={filterMarket===m} color={MARKETS[m]?.color||C.gold} onClick={()=>setFilterMarket(m)}/>)}
+            </div>
+
+            <div style={{...S.card(),padding:0,overflow:"hidden"}}>
+              <div style={{display:"grid",gridTemplateColumns:"2fr 1fr 0.6fr 0.6fr 1.4fr 0.7fr 0.7fr",padding:"9px 16px",borderBottom:`1px solid ${C.surf3}`,fontSize:10,color:C.muted,textTransform:"uppercase",letterSpacing:"0.1em"}}>
+                <div>Name</div><div>Stage</div><div>Score</div><div>Tier</div><div>Market</div><div>Source</div><div>Applied</div>
+              </div>
+              {filtered.length===0 && (
+                <div style={{padding:"40px",textAlign:"center",color:C.muted,fontSize:13}}>
+                  {connected ? "No applicants match this filter." : "Connect backend to see real applicants."}
+                </div>
+              )}
+              {filtered.map(a=>(
+                <div key={a.id}>
+                  <div onClick={()=>setSelectedApp(selectedApp?.id===a.id?null:a)} style={{display:"grid",gridTemplateColumns:"2fr 1fr 0.6fr 0.6fr 1.4fr 0.7fr 0.7fr",padding:"11px 16px",borderBottom:`1px solid ${C.surf3}22`,cursor:"pointer",background:selectedApp?.id===a.id?`${C.gold}0C`:"none"}}>
+                    <div style={{fontWeight:600}}>{a.name}</div>
+                    <div><span style={S.pill(SC[a.stage]||C.muted)}>{a.stage}</span></div>
+                    <div style={{fontWeight:700,color:a.score>=8?C.green:a.score>=6?C.gold:a.score>0?C.red:C.muted}}>{a.score>0?`${a.score}/10`:"—"}</div>
+                    <div><span style={{...S.pill(TIER_COLORS[a.tier]||C.muted),fontSize:10}}>{a.tier||"—"}</span></div>
+                    <div style={{fontSize:12,color:MARKETS[a.market]?.color||C.muted}}>{a.market?.split("/")[0]?.trim()}</div>
+                    <div style={{fontSize:12,color:C.muted}}>{a.source}</div>
+                    <div style={{fontSize:12,color:C.muted}}>{fmtDate(a.createdAt)}</div>
+                  </div>
+                  {selectedApp?.id===a.id&&(
+                    <div style={{padding:"16px",background:`${C.gold}08`,borderBottom:`1px solid ${C.gold}22`}}>
+                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:10,marginBottom:12}}>
+                        <div>
+                          <div style={{fontWeight:800,fontSize:16,marginBottom:2}}>{a.name}</div>
+                          <div style={{fontSize:12,color:C.muted}}>{a.phone} · {a.market} · {a.source}</div>
+                          {a.aiSummary&&<div style={{fontSize:12,color:C.muted,marginTop:4,fontStyle:"italic"}}>AI: {a.aiSummary}</div>}
+                        </div>
+                        <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+                          {["Screened","Interview","Offer","Hired","No Show"].map(s=>(
+                            <button key={s} onClick={()=>moveStage(a.id,s)} style={{padding:"5px 11px",borderRadius:7,border:`1px solid ${SC[s]}`,background:a.stage===s?`${SC[s]}33`:"none",color:SC[s],cursor:"pointer",fontSize:11,fontWeight:700}}>
+                              {a.stage===s?"✓ ":""}{s}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      {a.aiAction&&<div style={{padding:"8px 12px",background:C.surf2,borderRadius:8,fontSize:12,color:C.gold,fontWeight:600}}>AI Action: {a.aiAction}</div>}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ══ MARKETS ══ */}
+        {tab==="markets" && (
+          <div>
+            <div style={{fontSize:20,fontWeight:800,marginBottom:4}}>Arizona Markets</div>
+            <div style={{fontSize:13,color:C.muted,marginBottom:18}}>Live applicant counts vs. targets. Red = run ads now.</div>
+            <div style={S.grid("repeat(auto-fit,minmax(260px,1fr))")}>
+              {marketData.map(m=>(
+                <div key={m.market} style={S.cardB(m.color,{padding:0,overflow:"hidden"})}>
+                  <div style={{padding:"13px 16px",borderBottom:`1px solid ${C.surf3}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                    <div>
+                      <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:2}}>
+                        <div style={{width:8,height:8,borderRadius:"50%",background:m.color}}/>
+                        <span style={{fontWeight:700,fontSize:13}}>{m.market}</span>
+                      </div>
+                      <div style={{fontSize:11,color:C.muted}}>{m.hired} hired</div>
+                    </div>
+                    <div style={{textAlign:"right"}}>
+                      <div style={{fontSize:24,fontWeight:900,color:m.pctTarget<30?C.red:m.pctTarget>70?C.green:C.amber}}>{m.count}</div>
+                      <div style={{fontSize:10,color:C.muted}}>/ {m.target}</div>
+                    </div>
+                  </div>
+                  <div style={{padding:"12px 16px"}}>
+                    <div style={{display:"flex",justifyContent:"space-between",marginBottom:5,fontSize:11}}>
+                      <span style={{color:C.muted}}>Target progress</span>
+                      <span style={{fontWeight:700,color:m.pctTarget<30?C.red:m.pctTarget>70?C.green:C.amber}}>{m.pctTarget}%</span>
+                    </div>
+                    {S.bar(m.pctTarget,m.pctTarget<30?C.red:m.pctTarget>70?C.green:C.amber,7)}
+                    <div style={{marginTop:10,textAlign:"right"}}>
+                      <span style={{...S.pill(m.pctTarget<30?C.red:m.pctTarget>70?C.green:C.amber),fontSize:11}}>
+                        {m.pctTarget<30?"🔴 Run Ads":m.pctTarget>70?"🟢 Healthy":"🟡 Monitor"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ══ CONTENT ══ */}
+        {tab==="content" && (
+          <div>
+            <div style={{fontSize:20,fontWeight:800,marginBottom:4}}>Content Factory</div>
+            <div style={{fontSize:13,color:C.muted,marginBottom:18}}>AI-generated in Xavier's voice. Job posts, TikTok scripts, SMS sequences, objection handlers.</div>
+            <div style={{display:"grid",gridTemplateColumns:"260px 1fr",gap:18}}>
+              <div style={{display:"flex",flexDirection:"column",gap:12}}>
+                <div style={S.card()}>
+                  <div style={S.label}>Content Type</div>
+                  {Object.entries(CONTENT_TYPES).map(([k,v])=>(
+                    <button key={k} onClick={()=>setContentType(k)} style={{display:"flex",alignItems:"center",gap:9,width:"100%",padding:"9px 11px",marginBottom:5,borderRadius:8,border:`1px solid ${contentType===k?C.gold:C.surf3}`,background:contentType===k?`${C.gold}18`:C.surf2,cursor:"pointer",color:contentType===k?C.gold:C.muted,fontWeight:contentType===k?700:400,fontSize:12,textAlign:"left"}}>
+                      <span style={{fontSize:15}}>{v.icon}</span>{v.label}
+                    </button>
+                  ))}
+                </div>
+                <div style={S.card()}>
+                  <div style={S.label}>Market</div>
+                  {Object.keys(MARKETS).map(m=>(
+                    <button key={m} onClick={()=>setContentMarket(m)} style={{padding:"7px 10px",borderRadius:7,border:`1px solid ${contentMarket===m?MARKETS[m].color:C.surf3}`,background:contentMarket===m?`${MARKETS[m].color}18`:"none",color:contentMarket===m?MARKETS[m].color:C.muted,cursor:"pointer",fontSize:11,fontWeight:contentMarket===m?700:400,textAlign:"left",width:"100%",marginBottom:4}}>
+                      {m}
+                    </button>
+                  ))}
+                </div>
+                <button onClick={generateContent} disabled={generating} style={S.btn(generating?C.surf2:C.gold,{padding:"12px",fontSize:13,borderRadius:9,opacity:generating?0.7:1})}>
+                  {generating?"⚡ Writing...":"⚡ Generate"}
+                </button>
+              </div>
+              <div style={{minHeight:400}}>
+                {generated ? (
+                  <div style={{...S.card(),padding:0,overflow:"hidden",height:"100%",display:"flex",flexDirection:"column"}}>
+                    <div style={{padding:"11px 16px",borderBottom:`1px solid ${C.surf3}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                      <div style={{fontSize:12,color:C.muted,fontWeight:600}}>{CONTENT_TYPES[contentType]?.label} · {contentMarket}</div>
+                      <button onClick={()=>{navigator.clipboard.writeText(generated);setCopied(true);setTimeout(()=>setCopied(false),2000);}} style={S.btnO(C.gold,{fontSize:11,padding:"4px 12px"})}>
+                        {copied?"✓ Copied":"Copy"}
+                      </button>
+                    </div>
+                    <div style={{flex:1,overflowY:"auto"}}>
+                      <pre style={{padding:"18px",margin:0,whiteSpace:"pre-wrap",fontFamily:"inherit",fontSize:13,lineHeight:1.8}}>{generated}</pre>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{...S.card(),height:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",color:C.muted}}>
+                    <div style={{fontSize:44,marginBottom:12}}>{CONTENT_TYPES[contentType]?.icon}</div>
+                    <div style={{fontWeight:700,fontSize:15,marginBottom:6,color:C.text}}>Ready</div>
+                    <div style={{fontSize:13,textAlign:"center",maxWidth:260}}>Select type + market and hit Generate.</div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ══ SPRINT ══ */}
+        {tab==="sprint" && (
+          <div style={{maxWidth:680}}>
+            <div style={{fontSize:20,fontWeight:800,marginBottom:4}}>Sprint Recruiting Game</div>
+            <div style={{fontSize:13,color:C.muted,marginBottom:18}}>Competitions beat open incentives every time. $400 budget, fills your training class.</div>
+            <div style={S.cardB(C.gold,{textAlign:"center",marginBottom:18,padding:"24px 18px"})}>
+              <div style={{fontSize:11,color:C.gold,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.12em",marginBottom:8}}>
+                {sprintActive?`STEP ${sprintStep+1} LIVE`:"Sprint Timer"}
+              </div>
+              <div style={{fontSize:80,fontWeight:900,color:sprintActive?C.gold:C.muted,letterSpacing:"0.04em",lineHeight:1,fontVariantNumeric:"tabular-nums"}}>{fmtTime(sprintSecs)}</div>
+              <div style={{display:"flex",gap:10,justifyContent:"center",marginTop:16,flexWrap:"wrap"}}>
+                {[["▶ Step 1 — 10 min",600,0],["▶ Step 2 — 1 hr",3600,1]].map(([l,s,st])=>(
+                  <button key={l} onClick={()=>{setSprintStep(st);setSprintSecs(s);setSprintActive(true);}} style={S.btn(sprintStep===st&&sprintActive?C.gold:C.surf2,{border:`1px solid ${C.gold}`,color:sprintStep===st&&sprintActive?C.navy:C.gold})}>{l}</button>
+                ))}
+                <button onClick={()=>{setSprintActive(false);setSprintSecs(600);}} style={S.btnO(C.red)}>Reset</button>
+              </div>
+            </div>
+            {[{n:1,title:"25-Name Sprint",reward:"$100 cash NOW",time:"10 min",color:C.green,desc:"Every rep writes 25 names from their personal network. Fastest person wins $100 in hand. Run this with every new hire on Day 1 before their network goes cold.",script:null},
+              {n:2,title:"Group Text Blast",reward:"$100 cash NOW",time:"15 min",color:C.gold,desc:"Rep creates a group text with themselves, the manager, and the prospect. First to send 25 wins another $100.",script:"\"Hey [Name], want to intro you to my manager — we're building the team right now and I immediately thought of you. You'd crush it here. [Manager], meet [Name].\""},
+              {n:3,title:"Show-Up Bonus",reward:"$200 per show-up",time:"Ongoing",color:C.blue,desc:"Every time a rep's referral completes Week 1 of training, the referring rep gets $200 cash immediately. Paid the day it happens.",script:null}
+            ].map(s=>(
+              <div key={s.n} style={S.cardB(s.color,{marginBottom:12})}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:10,marginBottom:10}}>
+                  <div style={{display:"flex",alignItems:"center",gap:10}}>
+                    <div style={{width:38,height:38,borderRadius:9,background:`${s.color}22`,color:s.color,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:18}}>{s.n}</div>
+                    <div><div style={{fontWeight:800,fontSize:14}}>{s.title}</div><div style={{fontSize:11,color:C.muted}}>⏱ {s.time}</div></div>
+                  </div>
+                  <div style={{...S.pill(C.green),fontSize:12,padding:"5px 12px"}}>{s.reward}</div>
+                </div>
+                <div style={{fontSize:13,color:C.muted,lineHeight:1.7,marginBottom:s.script?10:0}}>{s.desc}</div>
+                {s.script&&<div style={{background:C.dark,borderRadius:8,padding:"10px 14px",fontSize:13,lineHeight:1.65,fontStyle:"italic"}}>{s.script}</div>}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ══ FOLLOW-UP ══ */}
+        {tab==="followup" && (
+          <div style={{maxWidth:680}}>
+            <div style={{fontSize:20,fontWeight:800,marginBottom:4}}>Follow-Up Sequences</div>
+            <div style={{fontSize:13,color:C.muted,marginBottom:18}}>Auto-fires via Twilio the moment someone applies. Copy these into your backend config.</div>
+            {[{title:"Touch 1 — Immediate (0–5 min)",color:C.green,sms:"Hey [Name]! This is Xavier — just saw your app for the roofing sales role in AZ. Free for a quick 10-min call today? Reply YES and I'll call within the hour. 🔨",email:null},
+              {title:"Touch 2 — Day 1 (2 hrs, no response)",color:C.gold,sms:"Hey [Name], still want to connect on the AZ roofing sales role. Our reps clear $12K–$18K/month. Territory wide open. Good time to talk? Reply STOP to opt out.",email:"Subject: Your application — quick call?\n\nHey [Name],\n\nFollowing up. I'd love to connect — a few reps just had their best month ever.\n\nGrab 15 min: certifiedcontractingaz.com/interview\nOr reply with your availability.\n\n– Xavier | Certified Contracting LLC | Arizona's Finest | (480) 901-0939"},
+              {title:"Touch 3 — Day 3 (Nurture)",color:C.purple,sms:"Quick question [Name] — biggest reason you're looking: money, schedule, or something else? Just reply, no pressure.",email:"Subject: Most people ask this first...\n\nHey [Name],\n\n\"Do I need roofing experience?\"\n\nNo. Our top rep had never touched a roof. We train everything.\n\nWhat we look for: hunger, work ethic, ability to talk to people.\n\nLet's talk this week: certifiedcontractingaz.com/interview\n\n– Xavier | Certified Contracting LLC"},
+              {title:"Touch 4 — Day 7 (Last Chance)",color:C.red,sms:"Hey [Name] — closing your app by end of week. Still interested in the roofing role? Reply YES and I'll get you set up.",email:"Subject: Closing your file Friday\n\nHey [Name],\n\nClosing your application this Friday if I don't hear back.\n\nStill interested? Reply or grab 15 min: certifiedcontractingaz.com/interview\n\n– Xavier | Certified Contracting LLC | Arizona's Finest"}
+            ].map((seq,i)=>(
+              <div key={i} style={{...S.card(),marginBottom:12,padding:0,overflow:"hidden",border:`1px solid ${seq.color}33`}}>
+                <div style={{padding:"11px 16px",borderBottom:`1px solid ${C.surf3}`,display:"flex",alignItems:"center",gap:8}}>
+                  <div style={{width:8,height:8,borderRadius:"50%",background:seq.color}}/>
+                  <div style={{fontWeight:700,fontSize:12,color:seq.color}}>{seq.title}</div>
+                </div>
+                <div style={{padding:"13px 16px"}}>
+                  <div style={S.label}>📱 SMS</div>
+                  <div style={{background:C.dark,borderRadius:8,padding:"10px 13px",fontSize:13,lineHeight:1.7,marginBottom:seq.email?12:0}}>{seq.sms}</div>
+                  {seq.email&&<><div style={S.label}>✉️ Email</div><pre style={{background:C.dark,borderRadius:8,padding:"10px 13px",fontSize:13,lineHeight:1.7,margin:0,whiteSpace:"pre-wrap",fontFamily:"inherit"}}>{seq.email}</pre></>}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ══ REPORTS ══ */}
+        {tab==="reports" && (
+          <div>
+            <div style={{fontSize:20,fontWeight:800,marginBottom:4}}>Reports</div>
+            <div style={{fontSize:13,color:C.muted,marginBottom:18}}>Live pipeline data + AI-written weekly executive summary.</div>
+            <div style={S.grid("1fr 1fr",{marginBottom:16})}>
+              <div style={S.cardB(C.gold)}>
+                <div style={{fontWeight:700,color:C.gold,marginBottom:12,fontSize:12}}>💰 In-House vs. Outsourced</div>
+                <div style={S.grid("1fr 1fr",{gap:10})}>
+                  <div style={{background:`${C.red}15`,borderRadius:9,padding:"13px",border:`1px solid ${C.red}33`}}>
+                    <div style={{fontSize:10,color:C.red,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:4}}>Outsourced</div>
+                    <div style={{fontSize:28,fontWeight:900,color:C.red}}>$3,000</div>
+                    <div style={{fontSize:11,color:C.muted}}>/month min</div>
+                  </div>
+                  <div style={{background:`${C.green}15`,borderRadius:9,padding:"13px",border:`1px solid ${C.green}33`}}>
+                    <div style={{fontSize:10,color:C.green,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:4}}>In-House</div>
+                    <div style={{fontSize:28,fontWeight:900,color:C.green}}>~$500</div>
+                    <div style={{fontSize:11,color:C.muted}}>/month</div>
+                  </div>
+                </div>
+                <div style={{marginTop:10,padding:"9px 12px",background:`${C.gold}15`,borderRadius:8,textAlign:"center",fontWeight:800,color:C.gold,fontSize:13}}>$30,000+ saved/year</div>
+              </div>
+              <div style={S.card()}>
+                <div style={{fontWeight:700,marginBottom:12,fontSize:12}}>📊 Funnel Health</div>
+                {[{l:"Applied → Screened",r:pct(stats.screened,stats.total),good:25,warn:15},{l:"Screened → Interview",r:pct(stats.interviewed,stats.screened),good:60,warn:40},{l:"Interview → Hired",r:pct(stats.hired,stats.interviewed),good:50,warn:30},{l:"No Show Rate",r:pct(stats.noShows,stats.total),good:10,warn:20,inv:true}].map(({l,r,good,warn,inv})=>{
+                  const ok=inv?r<=good:r>=good; const bad=inv?r>=warn:r<=warn;
+                  const color=ok?C.green:bad?C.red:C.amber;
+                  return <div key={l} style={{marginBottom:10}}>
+                    <div style={{display:"flex",justifyContent:"space-between",marginBottom:3,fontSize:11}}><span style={{color:C.muted}}>{l}</span><span style={{fontWeight:700,color}}>{r}% {ok?"✓":bad?"⚠":""}</span></div>
+                    {S.bar(r,color)}
+                  </div>;
+                })}
+              </div>
+            </div>
+            <div style={{...S.card(),marginBottom:14}}>
+              <div style={{fontWeight:700,marginBottom:12,fontSize:12}}>🗺️ Applicants by Market</div>
+              {marketData.map(m=>(
+                <div key={m.market} style={{marginBottom:10}}>
+                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:3,fontSize:11}}><span>{m.market}</span><span style={{fontWeight:700,color:m.color}}>{m.count}/{m.target} ({m.pctTarget}%)</span></div>
+                  {S.bar(m.pctTarget,m.color)}
+                </div>
+              ))}
+            </div>
+            <div style={S.card()}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+                <div style={{fontWeight:700,fontSize:12}}>📋 AI Weekly Report</div>
+                <button onClick={generateReport} disabled={reportLoading} style={S.btn(reportLoading?C.surf2:C.gold,{fontSize:12,padding:"7px 16px"})}>
+                  {reportLoading?"Generating...":"Generate Report"}
+                </button>
+              </div>
+              {reportText ? <pre style={{margin:0,whiteSpace:"pre-wrap",fontFamily:"inherit",fontSize:13,lineHeight:1.8}}>{reportText}</pre>
+                : <div style={{color:C.muted,fontSize:13,textAlign:"center",padding:"24px 0"}}>Hit Generate Report to get your AI weekly summary based on live data.</div>}
+            </div>
+          </div>
+        )}
+      </div>
+      <style>{`@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:${C.surf3};border-radius:10px}*{box-sizing:border-box}`}</style>
+    </div>
+  );
+}
+
+const root=ReactDOM.createRoot(document.getElementById("root"));root.render(React.createElement(App));</script></body></html>
